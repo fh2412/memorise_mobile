@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:memorise_mobile/core/router.dart';
+import 'package:memorise_mobile/core/theme.dart';
 import 'package:memorise_mobile/data/repositories/auth_repository.dart';
 import 'package:memorise_mobile/data/repositories/user_repository.dart';
 import 'package:memorise_mobile/data/services/api_service.dart';
@@ -51,7 +52,7 @@ class MemoriseApp extends StatelessWidget {
     return MaterialApp.router(
       routerConfig: AppRouter.router,
       title: 'Memorise',
-      theme: ThemeData(useMaterial3: true),
+      theme: MemoriseTheme.lightTheme,
     );
   }
 }
