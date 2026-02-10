@@ -1,0 +1,47 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:memorise_mobile/core/router.dart';
+import 'package:memorise_mobile/data/repositories/auth_repository.dart';
+import 'package:memorise_mobile/data/services/auth_service.dart';
+import 'package:memorise_mobile/ui/auth/view_models/login_view_model.dart';
+import 'package:memorise_mobile/ui/home/view_models/home_view_model.dart';
+import 'package:provider/provider.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
+  runApp(
+    MultiProvider(
+      providers: [
+        // 1. Initialize Services
+        Provider(create: (_) => AuthService()),
+        // 2. Initialize Repositories (Inject Service)
+        ProxyProvider<AuthService, AuthRepository>(
+          update: (_, service, __) => AuthRepository(service),
+        ),
+        // 3. Initialize ViewModels (Inject Repository)
+        ChangeNotifierProvider(
+          create: (context) => LoginViewModel(context.read<AuthRepository>()),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => HomeViewModel(context.read<AuthRepository>()),
+        ),
+      ],
+      child: const MemoriseApp(),
+    ),
+  );
+}
+
+class MemoriseApp extends StatelessWidget {
+  const MemoriseApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      routerConfig: AppRouter.router,
+      title: 'Memorise',
+      theme: ThemeData(useMaterial3: true),
+    );
+  }
+}
