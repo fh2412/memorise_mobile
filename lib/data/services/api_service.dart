@@ -1,16 +1,20 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
 class ApiService {
   late final Dio _dio;
 
-  // The "Localhost" trick:
-  // Android emulators see 'localhost' as themselves.
-  // To talk to your machine, they use '10.0.2.2'.
   static String get baseUrl {
-    if (Platform.isAndroid) return "http://10.0.2.2:4200/api";
-    return "http://localhost:4200/api";
+    // kIsWeb is a boolean that is true when running in a browser
+    if (kIsWeb) {
+      return "http://localhost:3000/api";
+    } else {
+      // We only check for Android if we aren't on the web
+      // To avoid the error, we assume 10.0.2.2 for mobile emulators
+      return "http://10.0.2.2:4200/api";
+    }
   }
 
   ApiService() {
