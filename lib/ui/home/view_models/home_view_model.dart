@@ -27,7 +27,7 @@ class HomeViewModel extends ChangeNotifier {
     try {
       user = await _userRepository.getUser(firebaseUid);
     } catch (e) {
-      error = "Could not fetch user data: $e";
+      error = "Could not fetch user data: $e $user";
     } finally {
       isLoading = false;
       notifyListeners();

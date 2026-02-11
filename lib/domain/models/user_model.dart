@@ -10,7 +10,6 @@ class MemoriseUser {
   final String country;
   final String countryCca2;
   final String gender;
-  final String formattedDob;
   final String dob;
   final String instagram;
   final int locationId;
@@ -27,7 +26,6 @@ class MemoriseUser {
     required this.country,
     required this.countryCca2,
     required this.gender,
-    required this.formattedDob,
     required this.dob,
     required this.instagram,
     required this.locationId,
@@ -39,18 +37,15 @@ class MemoriseUser {
   factory MemoriseUser.fromJson(Map<String, dynamic> json) {
     return MemoriseUser(
       userId: json['user_id'],
-      accountType: AccountType.values.byName(
-        json['account_type'],
-      ), // Maps string to enum
-      username: json['username'],
-      name: json['name'],
+      accountType: AccountType.values.byName(json['account_type']),
+      username: json['username'] ?? 'No username set',
+      name: json['name'] ?? 'No name set',
       email: json['email'],
-      bio: json['bio'] ?? '', // Handle potential nulls
-      country: json['country'],
-      countryCca2: json['country_cca2'],
-      gender: json['gender'],
-      formattedDob: json['formatted_dob'],
-      dob: json['dob'],
+      bio: json['bio'] ?? 'No bio set',
+      country: json['country'] ?? 'No country ser',
+      countryCca2: json['country_cca2'] ?? 'XX',
+      gender: json['gender'] ?? 'n.a.',
+      dob: json['dob'] ?? '01-01-1001',
       instagram: json['instagram'] ?? '',
       locationId: json['location_id'] ?? 0,
       profilePic: json['profilepic'] ?? '',
