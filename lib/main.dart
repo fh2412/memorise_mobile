@@ -8,6 +8,7 @@ import 'package:memorise_mobile/data/services/api_service.dart';
 import 'package:memorise_mobile/data/services/auth_service.dart';
 import 'package:memorise_mobile/ui/auth/view_models/login_view_model.dart';
 import 'package:memorise_mobile/ui/home/view_models/home_view_model.dart';
+import 'package:memorise_mobile/ui/user/view_models/user_card_view_model.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
@@ -34,6 +35,12 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (context) => HomeViewModel(
+            context.read<UserRepository>(),
+            context.read<AuthRepository>(),
+          )..fetchUserData(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => UserCardViewModel(
             context.read<UserRepository>(),
             context.read<AuthRepository>(),
           )..fetchUserData(),

@@ -46,5 +46,30 @@ class DefaultFirebaseOptions {
     }
   }
 
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyDGskWsqP1j_ztzWCPCxcgYwapBY1up60I',
+    appId: '1:541746469592:web:6042f95dca1cb87ba215ad',
+    messagingSenderId: '541746469592',
+    projectId: 'memorise-910c3',
+    authDomain: 'memorise-910c3.firebaseapp.com',
+    storageBucket: 'memorise-910c3.appspot.com',
+    measurementId: 'G-C3KK1EP48E',
+  );
 
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyA_-Jw6QHd7OcT_BIn7t5CzvOuXbHGBuF4',
+    appId: '1:541746469592:android:f74e1a6f315c9993a215ad',
+    messagingSenderId: '541746469592',
+    projectId: 'memorise-910c3',
+    storageBucket: 'memorise-910c3.appspot.com',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyCA-Z6NCc9-RdllKe5WSlJE0EeKE3uz5a8',
+    appId: '1:541746469592:ios:38d5ac2002f104c9a215ad',
+    messagingSenderId: '541746469592',
+    projectId: 'memorise-910c3',
+    storageBucket: 'memorise-910c3.appspot.com',
+    iosBundleId: 'com.example.memoriseMobile',
+  );
 }
