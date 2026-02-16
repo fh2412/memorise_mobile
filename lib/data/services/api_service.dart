@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -35,13 +34,27 @@ class ApiService {
     );
   }
 
-  // Your first GET request
   Future<Map<String, dynamic>> getUserData(String userId) async {
     try {
       final response = await _dio.get('/users/$userId');
       return response.data;
     } on DioException catch (e) {
-      // Dio gives you helpful error info (404, 500, timeout, etc.)
+      throw Exception('Failed to load user: ${e.message}');
+    }
+  }
+
+  Future<Map<String, dynamic>> sendFriendRequest(
+    String senderId,
+    String receiverId,
+  ) async {
+    try {
+      final response = await _dio.post(
+        '/friends/send_request',
+        data: {'senderId': senderId, 'receiverId': receiverId},
+      );
+
+      return response.data;
+    } on DioException catch (e) {
       throw Exception('Failed to load user: ${e.message}');
     }
   }

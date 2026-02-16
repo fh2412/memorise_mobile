@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:memorise_mobile/ui/user/views/friend_scanner_screen_view.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../view_models/user_card_view_model.dart';
@@ -193,52 +192,6 @@ class _UserCardState extends State<UserCard> {
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: SizedBox(
-                      height: 40,
-                      child: TextField(
-                        controller: _codeController,
-                        decoration: InputDecoration(
-                          hintText: "Enter Code",
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton.filled(
-                    onPressed: () async {
-                      // Open the scanner and wait for the result
-                      final String? scannedCode = await Navigator.push<String>(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ScannerScreen(),
-                        ),
-                      );
-
-                      if (scannedCode != null && mounted) {
-                        setState(() {
-                          _codeController.text = scannedCode;
-                        });
-
-                        // Optional: Automatically trigger a search/add logic
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Scanned: $scannedCode")),
-                        );
-                      }
-                    },
-                    icon: const Icon(Icons.camera_alt, size: 20),
-                  ),
-                ],
               ),
             ],
           ),
