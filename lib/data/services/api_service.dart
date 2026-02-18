@@ -58,4 +58,30 @@ class ApiService {
       throw Exception('Failed to load user: ${e.message}');
     }
   }
+
+  Future<List<dynamic>> getUserFriends(String userId) async {
+    try {
+      final response = await _dio.get('/friends/$userId');
+      return response.data as List;
+    } on DioException catch (e) {
+      throw Exception('Failed to load friends: ${e.message}');
+    }
+  }
+
+  Future<List<dynamic>> getIncomingRequests(String userId) async {
+    try {
+      final response = await _dio.get('/friends/ingoing/$userId');
+      return response.data as List;
+    } on DioException catch (e) {
+      throw Exception('Failed to load requests: ${e.message}');
+    }
+  }
+
+  Future<void> acceptFriendRequest(String userId, String friendId) async {
+    await _dio.put('/friends/accept_request/$userId/$friendId');
+  }
+
+  Future<void> declineFriendRequest(String userId, String friendId) async {
+    await _dio.delete('/friends/remove_friend/$userId/$friendId');
+  }
 }

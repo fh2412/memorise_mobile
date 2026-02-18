@@ -53,3 +53,32 @@ class MemoriseUser {
     );
   }
 }
+
+class Friend {
+  final String userId;
+  final String name;
+  final String email;
+  final String dob;
+  final String gender;
+  final String profilePic;
+
+  Friend({
+    required this.userId,
+    required this.name,
+    required this.email,
+    required this.dob,
+    required this.gender,
+    required this.profilePic,
+  });
+
+  factory Friend.fromJson(Map<String, dynamic> json) {
+    return Friend(
+      userId: json['user_id'],
+      name: json['name'] ?? 'No name set',
+      email: json['email'],
+      gender: json['gender'] ?? 'n.a.',
+      dob: json['dob'] ?? '01-01-1001',
+      profilePic: json['profilepic'] ?? '',
+    );
+  }
+}

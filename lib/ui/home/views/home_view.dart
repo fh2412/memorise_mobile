@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memorise_mobile/ui/user/views/friend_add_row_view.dart';
+import 'package:memorise_mobile/ui/user/views/friend_list_view.dart';
 import 'package:memorise_mobile/ui/user/views/user_card_view.dart';
 import 'package:provider/provider.dart';
 import '../view_models/home_view_model.dart';
@@ -37,7 +38,13 @@ class HomeView extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
-              children: [UserCard(), SizedBox(height: 25), FriendAddRow()],
+              children: [
+                const UserCard(),
+                const SizedBox(height: 25),
+                const FriendAddRow(),
+                const SizedBox(height: 25),
+                const Expanded(child: FriendList()),
+              ],
             ),
           );
         },

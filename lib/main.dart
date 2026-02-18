@@ -9,6 +9,7 @@ import 'package:memorise_mobile/data/services/auth_service.dart';
 import 'package:memorise_mobile/ui/auth/view_models/login_view_model.dart';
 import 'package:memorise_mobile/ui/home/view_models/home_view_model.dart';
 import 'package:memorise_mobile/ui/user/view_models/friend_add_row_view_model.dart';
+import 'package:memorise_mobile/ui/user/view_models/friend_list_view_model.dart';
 import 'package:memorise_mobile/ui/user/view_models/user_card_view_model.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
@@ -49,6 +50,10 @@ void main() async {
         ChangeNotifierProvider(
           create: (context) =>
               FriendAddViewModel(context.read<UserRepository>()),
+        ),
+        ChangeNotifierProvider(
+          create: (context) =>
+              FriendListViewModel(context.read<UserRepository>()),
         ),
       ],
       child: const MemoriseApp(),
