@@ -27,8 +27,6 @@ class _FriendListState extends State<FriendList> {
       child: Column(
         children: [
           const TabBar(
-            labelColor: Colors.blue, // Adjust to your theme
-            unselectedLabelColor: Colors.grey,
             tabs: [
               Tab(text: "Friends"),
               Tab(text: "Requests"),
@@ -142,7 +140,62 @@ class _FriendListState extends State<FriendList> {
                     ),
                   ],
                 )
-              : const Icon(Icons.chevron_right),
+              : PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert),
+                  onSelected: (value) async {
+                    if (value == 'view') {
+                      // TODO: Navigate to UserProfileScreen
+                      print("Navigate to profile of ${friend.userId}");
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Navigation to profile coming soon!"),
+                        ),
+                      );
+                    } else if (value == 'delete') {
+                      final success = await context
+                          .read<FriendListViewModel>()
+                          .removeFriendship(friend.userId, isRequest: false);
+
+                      if (success && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "${friend.name} removed from friends.",
+                            ),
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  itemBuilder: (BuildContext context) => [
+                    const PopupMenuItem(
+                      value: 'view',
+                      child: ListTile(
+                        leading: Icon(Icons.person_outline),
+                        title: Text('View Profile'),
+                        contentPadding: EdgeInsets.zero,
+                        dense: true,
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: ListTile(
+                        leading: Icon(
+                          Icons.person_remove,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        title: Text(
+                          'Delete Friend',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.zero,
+                        dense: true,
+                      ),
+                    ),
+                  ],
+                ),
         );
       },
     );

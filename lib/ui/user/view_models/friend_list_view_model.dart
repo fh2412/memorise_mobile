@@ -61,4 +61,30 @@ class FriendListViewModel extends ChangeNotifier {
       return false;
     }
   }
+
+  Future<bool> removeFriendship(
+    String friendId, {
+    bool isRequest = false,
+  }) async {
+    final firebaseUid = FirebaseAuth.instance.currentUser?.uid;
+    if (firebaseUid == null) return false;
+
+    try {
+      // Both use the 'decline' repository method per your backend logic
+      await _userRepository.declineRequest(firebaseUid, friendId);
+
+      if (isRequest) {
+        incomingRequests.removeWhere((f) => f.userId == friendId);
+      } else {
+        userFriends.removeWhere((f) => f.userId == friendId);
+      }
+
+      notifyListeners();
+      return true;
+    } catch (e) {
+      error = "Removal failed: $e";
+      notifyListeners();
+      return false;
+    }
+  }
 }
