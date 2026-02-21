@@ -5,8 +5,8 @@ import 'package:memorise_mobile/ui/user/views/user_card_view.dart';
 import 'package:provider/provider.dart';
 import '../view_models/user_screen_view_model.dart';
 
-class HomeView extends StatelessWidget {
-  const HomeView({super.key});
+class UserScreenView extends StatelessWidget {
+  const UserScreenView({super.key});
 
   @override
   Widget build(BuildContext context) {

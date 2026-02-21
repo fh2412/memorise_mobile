@@ -6,14 +6,12 @@ import '../../../domain/models/user_model.dart';
 class UserScreenViewModel extends ChangeNotifier {
   final UserRepository _userRepository;
 
-  // State variables
   MemoriseUser? user;
   bool isLoading = false;
   String? error;
 
   UserScreenViewModel(this._userRepository);
 
-  // Initial fetch called when the app starts/home loads
   Future<void> fetchUserData() async {
     final firebaseUid = FirebaseAuth.instance.currentUser?.uid;
     if (firebaseUid == null) return;

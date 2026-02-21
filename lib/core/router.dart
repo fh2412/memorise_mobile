@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:memorise_mobile/ui/user/views/user_screen_view.dart';
 import '../ui/auth/views/login_view.dart';
 import '../ui/home/views/home_view.dart';
 
@@ -30,6 +31,7 @@ class AppRouter {
     routes: [
       GoRoute(path: '/', builder: (context, state) => HomeView()),
       GoRoute(path: '/login', builder: (context, state) => LoginView()),
+      GoRoute(path: '/user', builder: (context, state) => UserScreenView()),
     ],
   );
 }

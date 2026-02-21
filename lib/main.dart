@@ -11,6 +11,7 @@ import 'package:memorise_mobile/ui/home/view_models/home_view_model.dart';
 import 'package:memorise_mobile/ui/user/view_models/friend_add_row_view_model.dart';
 import 'package:memorise_mobile/ui/user/view_models/friend_list_view_model.dart';
 import 'package:memorise_mobile/ui/user/view_models/user_card_view_model.dart';
+import 'package:memorise_mobile/ui/user/view_models/user_screen_view_model.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
@@ -36,10 +37,12 @@ void main() async {
           create: (context) => LoginViewModel(context.read<AuthRepository>()),
         ),
         ChangeNotifierProvider(
-          create: (context) => HomeViewModel(
-            context.read<UserRepository>(),
-            context.read<AuthRepository>(),
-          )..fetchUserData(),
+          create: (context) => HomeViewModel(context.read<AuthRepository>()),
+        ),
+        ChangeNotifierProvider(
+          create: (context) =>
+              UserScreenViewModel(context.read<UserRepository>())
+                ..fetchUserData(),
         ),
         ChangeNotifierProvider(
           create: (context) => UserCardViewModel(

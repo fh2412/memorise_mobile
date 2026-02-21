@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:memorise_mobile/ui/user/views/friend_add_row_view.dart';
-import 'package:memorise_mobile/ui/user/views/friend_list_view.dart';
-import 'package:memorise_mobile/ui/user/views/user_card_view.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../view_models/home_view_model.dart';
 
@@ -10,44 +8,60 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final secondaryColor = Theme.of(context).colorScheme.secondary;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Memorise"),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => context.read<HomeViewModel>().logout(),
+            icon: const Icon(Icons.account_circle),
+            onPressed: () => context.push('/user'),
           ),
         ],
       ),
-      body: Consumer<HomeViewModel>(
-        builder: (context, vm, child) {
-          if (vm.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/no-memories.webp',
+                width: 250,
+                height: 250,
+                fit: BoxFit.cover,
+              ),
+              const SizedBox(height: 24),
 
-          if (vm.error != null) {
-            return Center(
-              child: Text(vm.error!, style: const TextStyle(color: Colors.red)),
-            );
-          }
-
-          final user = vm.user;
-          if (user == null) return const Center(child: Text("No user found"));
-
-          return Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              children: [
-                const UserCard(),
-                const SizedBox(height: 25),
-                const FriendAddRow(),
-                const SizedBox(height: 25),
-                const Expanded(child: FriendList()),
-              ],
-            ),
-          );
-        },
+              Text.rich(
+                TextSpan(
+                  text: 'You have not created any ',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                  children: [
+                    TextSpan(
+                      text: 'MEMORIES',
+                      style: TextStyle(
+                        color: secondaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const TextSpan(text: ' yet. Create one now and start '),
+                    TextSpan(
+                      text: 'MEMORISING',
+                      style: TextStyle(
+                        color: secondaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const TextSpan(text: '!'),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
