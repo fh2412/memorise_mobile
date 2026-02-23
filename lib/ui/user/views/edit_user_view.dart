@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memorise_mobile/ui/auth/views/logout_view.dart';
 import 'package:provider/provider.dart';
 import '../view_models/edit_user_view_model.dart';
 
@@ -118,19 +119,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
                   const Divider(),
                   const SizedBox(height: 16),
                   // LOGOUT PLACEHOLDER
-                  SizedBox(
-                    width: double.infinity,
-                    child: TextButton.icon(
-                      onPressed: () {
-                        /* Future Logout */
-                      },
-                      icon: Icon(Icons.logout, color: colorScheme.error),
-                      label: Text(
-                        "Logout",
-                        style: TextStyle(color: colorScheme.error),
-                      ),
-                    ),
-                  ),
+                  const LogoutButton(),
                 ],
               ),
             ),
