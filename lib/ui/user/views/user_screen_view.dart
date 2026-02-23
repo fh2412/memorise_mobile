@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memorise_mobile/ui/user/views/edit_user_view.dart';
 import 'package:memorise_mobile/ui/user/views/friend_add_row_view.dart';
 import 'package:memorise_mobile/ui/user/views/friend_list_view.dart';
 import 'package:memorise_mobile/ui/user/views/user_card_view.dart';
@@ -14,7 +15,37 @@ class UserScreenView extends StatelessWidget {
       appBar: AppBar(
         title: const Text("User Page"),
         actions: [
-          IconButton(icon: const Icon(Icons.settings), onPressed: () => ''),
+          Consumer<UserScreenViewModel>(
+            builder: (context, vm, child) {
+              return IconButton(
+                icon: const Icon(Icons.settings),
+                onPressed: () {
+                  // Ensure we have data before opening the dialog
+                  if (vm.user != null) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => EditUserDialog(
+                        userId: vm.user!.userId,
+                        userData: {
+                          'name': vm.user!.name,
+                          'bio': vm.user!.bio,
+                          'dob': vm.user!.dob,
+                          'gender': vm.user!.gender,
+                        },
+                      ),
+                    );
+                  } else {
+                    // Optional: Show a message if data isn't loaded yet
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("User data still loading..."),
+                      ),
+                    );
+                  }
+                },
+              );
+            },
+          ),
         ],
       ),
       body: Consumer<UserScreenViewModel>(

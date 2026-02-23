@@ -26,11 +26,16 @@ class HomeView extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                'assets/no-memories.webp',
-                width: 250,
-                height: 250,
-                fit: BoxFit.cover,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(
+                  20.0,
+                ), // Adjust the value for more/less rounding
+                child: Image.asset(
+                  'assets/no-memories.webp',
+                  width: 250,
+                  height: 250,
+                  fit: BoxFit.cover,
+                ),
               ),
               const SizedBox(height: 24),
 

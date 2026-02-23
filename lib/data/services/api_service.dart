@@ -84,4 +84,12 @@ class ApiService {
   Future<void> declineFriendRequest(String userId, String friendId) async {
     await _dio.delete('/friends/remove_friend/$userId/$friendId');
   }
+
+  Future<void> updateUser(String userId, Map<String, dynamic> data) async {
+    try {
+      await _dio.put('/users/$userId', data: data);
+    } on DioException catch (e) {
+      throw e.response?.data['message'] ?? "Failed to update user";
+    }
+  }
 }

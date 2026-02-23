@@ -27,13 +27,11 @@ class UserRepository {
 
   Future<List<Friend>> getUserFriends(String userId) async {
     final List<dynamic> rawData = await _apiService.getUserFriends(userId);
-    print('Friends: $rawData');
     return rawData.map((json) => Friend.fromJson(json)).toList();
   }
 
   Future<List<Friend>> getIncomingRequests(String userId) async {
     final List<dynamic> rawData = await _apiService.getIncomingRequests(userId);
-    print('Incoming: $rawData');
     return rawData.map((json) => Friend.fromJson(json)).toList();
   }
 
@@ -42,4 +40,8 @@ class UserRepository {
 
   Future<void> declineRequest(String userId, String friendId) =>
       _apiService.declineFriendRequest(userId, friendId);
+
+  Future<void> updateUserData(String userId, Map<String, dynamic> data) async {
+    await _apiService.updateUser(userId, data);
+  }
 }
