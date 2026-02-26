@@ -31,9 +31,8 @@ void main() async {
         ProxyProvider<AuthService, AuthRepository>(
           update: (_, service, __) => AuthRepository(service),
         ),
-        ProxyProvider<ApiService, UserRepository>(
-          update: (_, api, __) => UserRepository(api),
-        ),
+        // In MultiProvider:
+        ChangeNotifierProvider(create: (_) => UserRepository(ApiService())),
         // 3. Initialize ViewModels (Inject Repository)
         ChangeNotifierProvider(
           create: (context) => LoginViewModel(context.read<AuthRepository>()),
@@ -50,7 +49,7 @@ void main() async {
           create: (context) => UserCardViewModel(
             context.read<UserRepository>(),
             context.read<AuthRepository>(),
-          )..fetchUserData(),
+          ),
         ),
         ChangeNotifierProvider(
           create: (context) =>

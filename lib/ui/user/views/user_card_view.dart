@@ -76,7 +76,7 @@ class _UserCardState extends State<UserCard> {
   Widget _buildCardFrame(BuildContext context, Widget content) {
     return Container(
       width: double.infinity,
-      constraints: const BoxConstraints(minHeight: 180),
+      constraints: const BoxConstraints(minHeight: 160),
       child: Card(
         elevation: 4,
         shadowColor: Theme.of(context).colorScheme.shadow,
@@ -133,12 +133,6 @@ class _UserCardState extends State<UserCard> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Text(
-                "@${user.username}",
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-              ),
               const SizedBox(height: 8),
               Text(
                 user.bio,
@@ -155,7 +149,7 @@ class _UserCardState extends State<UserCard> {
 
   Widget _buildBackSide(MemoriseUser user, UserCardViewModel viewModel) {
     // Assuming friendCode is added to model or just using userId for now
-    final friendCode = user.userId.substring(0, 8).toUpperCase();
+    final friendCode = user.userId.toUpperCase();
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -164,7 +158,7 @@ class _UserCardState extends State<UserCard> {
         QrImageView(
           data: user.userId,
           version: QrVersions.auto,
-          size: 100.0,
+          size: 110.0,
           eyeStyle: QrEyeStyle(
             eyeShape: QrEyeShape.square,
             color: Theme.of(context).colorScheme.onSurface,
@@ -187,7 +181,7 @@ class _UserCardState extends State<UserCard> {
               ),
               SelectableText(
                 friendCode,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   letterSpacing: 2,
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.primary,

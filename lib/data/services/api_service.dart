@@ -87,7 +87,7 @@ class ApiService {
 
   Future<void> updateUser(String userId, Map<String, dynamic> data) async {
     try {
-      await _dio.put('/users/$userId', data: data);
+      await _dio.put('/users/mobile/$userId', data: data);
     } on DioException catch (e) {
       throw e.response?.data['message'] ?? "Failed to update user";
     }

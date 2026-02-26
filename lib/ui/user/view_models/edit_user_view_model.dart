@@ -46,6 +46,10 @@ class EditUserViewModel extends ChangeNotifier {
         'bio': bioController.text,
         'dob': selectedDob?.toIso8601String(),
         'gender': selectedGender,
+        'country': '',
+        'country_cca2': '',
+        'username': '',
+        'instagram': '',
       });
       isLoading = false;
       notifyListeners();

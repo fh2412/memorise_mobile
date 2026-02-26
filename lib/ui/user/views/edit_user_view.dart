@@ -118,7 +118,6 @@ class _EditUserDialogState extends State<EditUserDialog> {
                   const SizedBox(height: 24),
                   const Divider(),
                   const SizedBox(height: 16),
-                  // LOGOUT PLACEHOLDER
                   const LogoutButton(),
                 ],
               ),
@@ -131,7 +130,6 @@ class _EditUserDialogState extends State<EditUserDialog> {
           actions: [
             Row(
               children: [
-                // CANCEL BUTTON (Outlined + Error Theme)
                 Expanded(
                   child: OutlinedButton(
                     onPressed: vm.isLoading

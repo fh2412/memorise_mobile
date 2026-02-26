@@ -51,26 +51,21 @@ class _FriendAddRowState extends State<FriendAddRow> {
       children: [
         Consumer<FriendAddViewModel>(
           builder: (context, vm, child) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    // Text Field with integrated Scan button
-                    Expanded(
-                      child: TextField(
-                        controller: vm.codeController,
-                        decoration: InputDecoration(
-                          hintText: "Friend Code",
-                          isDense: true,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 12,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          suffixIcon: IconButton(
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: vm.codeController,
+                    decoration: InputDecoration(
+                      labelText: "Friend Code",
+                      prefixIcon: const Icon(Icons.person_search_outlined),
+                      // We put both actions in a small Row inside the suffix
+                      suffixIcon: Row(
+                        mainAxisSize: MainAxisSize.min, // Essential!
+                        children: [
+                          IconButton(
                             icon: const Icon(Icons.qr_code_scanner, size: 20),
                             onPressed: () async {
                               final code = await Navigator.push<String>(
@@ -82,39 +77,42 @@ class _FriendAddRowState extends State<FriendAddRow> {
                               if (code != null) vm.updateCode(code);
                             },
                           ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    // Send Button
-                    vm.isLoading
-                        ? const SizedBox(
-                            width: 40,
-                            height: 40,
-                            child: Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                          )
-                        : IconButton.filled(
-                            onPressed: () => _handleSend(vm),
-                            icon: const Icon(Icons.send_rounded),
-                            tooltip: "Send Request",
+                          // The Send button is now perfectly aligned inside the field
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: vm.isLoading
+                                ? const SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : IconButton(
+                                    onPressed: () => _handleSend(vm),
+                                    icon: const Icon(Icons.send_rounded),
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                  ),
                           ),
-                  ],
-                ),
-                if (vm.errorMessage != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4, left: 4),
-                    child: Text(
-                      vm.errorMessage!,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
-                        fontSize: 12,
+                        ],
                       ),
                     ),
                   ),
-              ],
+                  if (vm.errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4, left: 45),
+                      child: Text(
+                        vm.errorMessage!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             );
           },
         ),
