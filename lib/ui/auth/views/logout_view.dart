@@ -16,22 +16,17 @@ class LogoutButton extends StatelessWidget {
       builder: (context, vm, child) {
         return SizedBox(
           width: isFullWidth ? double.infinity : null,
-          child: OutlinedButton.icon(
+          child: ElevatedButton.icon(
             onPressed: vm.isLoading ? null : () => _handleLogout(context, vm),
             icon: vm.isLoading
-                ? const SizedBox(
+                ? SizedBox(
                     width: 18,
                     height: 18,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.red,
-                    ),
+                    child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : Icon(Icons.logout, color: colorScheme.error),
-            label: Text("Logout", style: TextStyle(color: colorScheme.error)),
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(color: colorScheme.error),
-            ),
+                : Icon(Icons.logout),
+            label: Text("Logout"),
+            style: ElevatedButton.styleFrom(backgroundColor: colorScheme.error),
           ),
         );
       },

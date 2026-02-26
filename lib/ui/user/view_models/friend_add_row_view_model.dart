@@ -18,7 +18,15 @@ class FriendAddViewModel extends ChangeNotifier {
     final receiverCode = codeController.text.trim();
     final currentUserId = FirebaseAuth.instance.currentUser?.uid;
 
-    if (receiverCode.isEmpty) return;
+    if (receiverCode.isEmpty) {
+      _errorMessage = 'No Friendship-Code was enterd!';
+      return;
+    }
+
+    if (receiverCode == currentUserId?.toUpperCase()) {
+      _errorMessage = 'You cannot send a firendrequest to yourself';
+      return;
+    }
 
     _isLoading = true;
     _errorMessage = 'Error sending Friend request';

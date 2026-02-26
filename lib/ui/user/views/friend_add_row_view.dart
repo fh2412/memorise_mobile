@@ -61,9 +61,8 @@ class _FriendAddRowState extends State<FriendAddRow> {
                     decoration: InputDecoration(
                       labelText: "Friend Code",
                       prefixIcon: const Icon(Icons.person_search_outlined),
-                      // We put both actions in a small Row inside the suffix
                       suffixIcon: Row(
-                        mainAxisSize: MainAxisSize.min, // Essential!
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
                             icon: const Icon(Icons.qr_code_scanner, size: 20),
@@ -77,7 +76,6 @@ class _FriendAddRowState extends State<FriendAddRow> {
                               if (code != null) vm.updateCode(code);
                             },
                           ),
-                          // The Send button is now perfectly aligned inside the field
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0),
                             child: vm.isLoading
