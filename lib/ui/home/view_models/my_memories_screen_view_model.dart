@@ -1,16 +1,23 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:memorise_mobile/data/repositories/auth_repository.dart';
 import 'package:memorise_mobile/data/repositories/memory_repository.dart';
 import 'package:memorise_mobile/domain/models/memory_model.dart';
 
 class MemoryViewModel extends ChangeNotifier {
   final MemoryRepository _repository;
-  final String userId;
+  final AuthRepository _authRepository;
 
-  MemoryViewModel({required MemoryRepository repository, required this.userId})
-    : _repository = repository;
+  MemoryViewModel(this._repository, this._authRepository);
 
   List<Memory> _memories = [];
   List<Memory> get memories => _memories;
+
+  List<Memory> _filteredMemories = [];
+  List<Memory> get filteredMemories =>
+      _filteredMemories.isEmpty && _memories.isNotEmpty
+      ? _memories
+      : _filteredMemories;
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -18,13 +25,17 @@ class MemoryViewModel extends ChangeNotifier {
   String? _error;
   String? get error => _error;
 
-  /// Fetch memories based on the two boolean toggles from the UI
   Future<void> fetchMemories({
     required bool showMine,
     required bool showShared,
   }) async {
+    print('FETCHING MEMORIES');
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    print(userId);
+
+    if (userId == null) return;
+
     _isLoading = true;
-    _error = null;
     notifyListeners();
 
     try {
@@ -50,11 +61,27 @@ class MemoryViewModel extends ChangeNotifier {
       );
 
       _memories = response.data;
+      _filteredMemories = [];
     } catch (e) {
       _error = e.toString();
     } finally {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  void filterBySearch(String query) {
+    if (query.isEmpty) {
+      _filteredMemories = _memories;
+    } else {
+      _filteredMemories = _memories
+          .where(
+            (m) =>
+                m.title.toLowerCase().contains(query.toLowerCase()) ||
+                m.text.toLowerCase().contains(query.toLowerCase()),
+          )
+          .toList();
+    }
+    notifyListeners();
   }
 }

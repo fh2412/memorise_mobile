@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:memorise_mobile/domain/models/memory_model.dart';
 import 'package:memorise_mobile/ui/core/view/special_create_button_view.dart';
 import 'package:memorise_mobile/ui/home/view_models/my_memories_screen_view_model.dart';
+import 'package:provider/provider.dart';
 
 class MyMemoriesView extends StatefulWidget {
   const MyMemoriesView({super.key});
@@ -11,8 +12,6 @@ class MyMemoriesView extends StatefulWidget {
 }
 
 class _MyMemoriesViewState extends State<MyMemoriesView> {
-  late MemoryViewModel _viewModel;
-
   bool _showOnlyMine = true;
   bool _showShared = true;
   final TextEditingController _searchController = TextEditingController();
@@ -20,21 +19,22 @@ class _MyMemoriesViewState extends State<MyMemoriesView> {
   @override
   void initState() {
     super.initState();
-    // Initialize your repository and viewmodel here or inject them
-    // _viewModel = MemoryViewModel(repository: ..., userId: ...);
-
-    // Initial fetch
+    // Use addPostFrameCallback to trigger the initial fetch after the first build
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _refresh();
     });
   }
 
   void _refresh() {
-    _viewModel.fetchMemories(showMine: _showOnlyMine, showShared: _showShared);
+    // Use read here because we are calling a function, not rebuilding based on value changes
+    context.read<MemoryViewModel>().fetchMemories(
+      showMine: _showOnlyMine,
+      showShared: _showShared,
+    );
   }
 
   void _onSearchChanged(String query) {
-    // TODO: Implement search logic
+    context.read<MemoryViewModel>().filterBySearch(query);
   }
 
   void _handleCreateNew() {
@@ -43,8 +43,12 @@ class _MyMemoriesViewState extends State<MyMemoriesView> {
 
   @override
   Widget build(BuildContext context) {
+    // watch() makes this build method run every time notifyListeners() is called in the VM
+    final viewModel = context.watch<MemoryViewModel>();
+    final memories = viewModel.filteredMemories;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F9FF), // Your Surface Color
+      backgroundColor: const Color(0xFFF9F9FF),
       body: CustomScrollView(
         slivers: [
           // 1. The Sticky Filter Bar
@@ -52,29 +56,22 @@ class _MyMemoriesViewState extends State<MyMemoriesView> {
             pinned: true,
             delegate: _FilterBarDelegate(
               child: Container(
-                color: const Color(
-                  0xFFF9F9FF,
-                ).withValues(alpha: 0.95), // Slight glass effect
+                color: const Color(0xFFF9F9FF).withValues(alpha: 0.95),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 8,
                 ),
                 child: Column(
                   children: [
-                    SearchAnchor(
-                      builder: (context, controller) {
-                        return SearchBar(
-                          controller: _searchController,
-                          hintText: "Search your memories...",
-                          onChanged: _onSearchChanged,
-                          leading: const Icon(Icons.search),
-                          elevation: WidgetStateProperty.all(0),
-                          backgroundColor: WidgetStateProperty.all(
-                            const Color(0xFF305EA0).withValues(alpha: 0.05),
-                          ),
-                        );
-                      },
-                      suggestionsBuilder: (context, controller) => [],
+                    SearchBar(
+                      controller: _searchController,
+                      hintText: "Search your memories...",
+                      onChanged: _onSearchChanged,
+                      leading: const Icon(Icons.search),
+                      elevation: WidgetStateProperty.all(0),
+                      backgroundColor: WidgetStateProperty.all(
+                        const Color(0xFF305EA0).withValues(alpha: 0.05),
+                      ),
                     ),
                     const SizedBox(height: 12),
                     Row(
@@ -82,15 +79,19 @@ class _MyMemoriesViewState extends State<MyMemoriesView> {
                         FilterChip(
                           label: const Text("My Memories"),
                           selected: _showOnlyMine,
-                          onSelected: (val) =>
-                              setState(() => _showOnlyMine = val),
+                          onSelected: (val) {
+                            setState(() => _showOnlyMine = val);
+                            _refresh(); // Fetch new data based on route
+                          },
                         ),
                         const SizedBox(width: 8),
                         FilterChip(
                           label: const Text("Shared with me"),
                           selected: _showShared,
-                          onSelected: (val) =>
-                              setState(() => _showShared = val),
+                          onSelected: (val) {
+                            setState(() => _showShared = val);
+                            _refresh(); // Fetch new data based on route
+                          },
                         ),
                       ],
                     ),
@@ -100,37 +101,36 @@ class _MyMemoriesViewState extends State<MyMemoriesView> {
             ),
           ),
 
-          // 2. The Main Content (Empty State)
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.auto_awesome_mosaic_outlined,
-                    size: 80,
-                    color: const Color(0xFF305EA0).withValues(alpha: 0.2),
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    "No memories found",
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF305EA0),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    "It's time to start Memorising! Capture your trips and share them with friends.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.black54),
-                  ),
-                ],
+          // 2. Loading Indicator
+          if (viewModel.isLoading)
+            const SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(child: CircularProgressIndicator()),
+            )
+          // 3. Error State
+          else if (viewModel.error != null)
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(child: Text("Error: ${viewModel.error}")),
+            )
+          // 4. Memory List
+          else if (memories.isNotEmpty)
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              // Use the 'sliver' named argument here
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) => _MemoryCard(memory: memories[index]),
+                  childCount: memories.length,
+                ),
               ),
+            )
+          // 5. Empty State
+          else
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: _buildEmptyState(),
             ),
-          ),
         ],
       ),
 
@@ -139,6 +139,31 @@ class _MyMemoriesViewState extends State<MyMemoriesView> {
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 16),
         child: AnimatedMagicCreateButton(onTap: _handleCreateNew),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Padding(
+      padding: const EdgeInsets.all(32.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.auto_awesome_mosaic_outlined,
+            size: 80,
+            color: const Color(0xFF305EA0).withOpacity(0.2),
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            "No memories found",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
+          const Text(
+            "Capture your trips and share them with friends.",
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

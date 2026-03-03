@@ -6,6 +6,8 @@ class AuthService {
   // Stream to listen to auth state changes (used by the Router)
   Stream<User?> get userState => _auth.authStateChanges();
 
+  User? get currentUser => null;
+
   Future<UserCredential> signIn(String email, String password) {
     return _auth.signInWithEmailAndPassword(email: email, password: password);
   }
