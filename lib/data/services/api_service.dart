@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:memorise_mobile/domain/models/responses.dart';
 
 class ApiService {
   late final Dio _dio;
@@ -90,6 +91,25 @@ class ApiService {
       await _dio.put('/users/mobile/$userId', data: data);
     } on DioException catch (e) {
       throw e.response?.data['message'] ?? "Failed to update user";
+    }
+  }
+
+  Future<PaginatedMemoryResponse> getMemories(
+    String userId,
+    String endpoint, {
+    int page = 1,
+    int pageSize = 9,
+  }) async {
+    try {
+      final response = await _dio.get(
+        '$endpoint/$userId',
+        queryParameters: {'page': page, 'pageSize': pageSize},
+      );
+
+      // Using your existing PaginatedMemoryResponse model
+      return PaginatedMemoryResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      throw Exception('Failed to load memories: ${e.message}');
     }
   }
 }

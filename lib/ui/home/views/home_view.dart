@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:memorise_mobile/ui/home/views/my_memories_screen_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -59,19 +60,9 @@ class _HomeViewState extends State<HomeView> {
   }
 }
 
-/// Placeholder for the Discovery Tab
+/// Your original "Empty State" UI moved to its own widget
 class DiscoveryView extends StatelessWidget {
   const DiscoveryView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text("Discovery Content Goes Here"));
-  }
-}
-
-/// Your original "Empty State" UI moved to its own widget
-class MyMemoriesView extends StatelessWidget {
-  const MyMemoriesView({super.key});
 
   @override
   Widget build(BuildContext context) {
