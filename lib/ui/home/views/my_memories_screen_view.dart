@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:memorise_mobile/domain/models/memory_model.dart';
 import 'package:memorise_mobile/ui/core/view/special_create_button_view.dart';
 import 'package:memorise_mobile/ui/home/view_models/my_memories_screen_view_model.dart';
+import 'package:memorise_mobile/ui/home/views/memory_detail_screen_view.dart';
 import 'package:provider/provider.dart';
 
 class MyMemoriesView extends StatefulWidget {
@@ -199,7 +200,7 @@ class _MemoryCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.black.withOpacity(0.05)),
+        side: BorderSide(color: Colors.black.withValues(alpha: 0.05)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -234,7 +235,18 @@ class _MemoryCard extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: Colors.grey),
+            IconButton(
+              icon: const Icon(Icons.chevron_right, color: Colors.blue),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        MemoryDetailScreen(memoryId: memory.memoryId),
+                  ),
+                );
+              },
+            ),
           ],
         ),
       ),

@@ -1,14 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:memorise_mobile/data/repositories/auth_repository.dart';
 import 'package:memorise_mobile/data/repositories/memory_repository.dart';
 import 'package:memorise_mobile/domain/models/memory_model.dart';
 
 class MemoryViewModel extends ChangeNotifier {
   final MemoryRepository _repository;
-  final AuthRepository _authRepository;
 
-  MemoryViewModel(this._repository, this._authRepository);
+  MemoryViewModel(this._repository);
 
   List<Memory> _memories = [];
   List<Memory> get memories => _memories;
@@ -29,9 +27,7 @@ class MemoryViewModel extends ChangeNotifier {
     required bool showMine,
     required bool showShared,
   }) async {
-    print('FETCHING MEMORIES');
     final userId = FirebaseAuth.instance.currentUser?.uid;
-    print(userId);
 
     if (userId == null) return;
 
@@ -48,7 +44,6 @@ class MemoryViewModel extends ChangeNotifier {
       } else if (showShared) {
         filter = MemoryFilter.added;
       } else {
-        // If nothing is selected, we return an empty list without calling the API
         _memories = [];
         _isLoading = false;
         notifyListeners();

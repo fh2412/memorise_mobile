@@ -10,8 +10,8 @@ class MemoryRepository {
   Future<PaginatedMemoryResponse> fetchMemories({
     required String userId,
     required MemoryFilter filter,
-    int page = 1,
-    int pageSize = 9,
+    int page = 0,
+    int pageSize = 50,
   }) async {
     String endpoint;
 
@@ -34,5 +34,9 @@ class MemoryRepository {
       page: page,
       pageSize: pageSize,
     );
+  }
+
+  Future<Memory> fetchMemoryDetails({required String memoryId}) async {
+    return await _memoryService.getMemoryDetails(memoryId);
   }
 }

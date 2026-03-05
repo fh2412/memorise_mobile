@@ -10,6 +10,7 @@ import 'package:memorise_mobile/data/services/auth_service.dart';
 import 'package:memorise_mobile/ui/auth/view_models/login_view_model.dart';
 import 'package:memorise_mobile/ui/auth/view_models/logout_view_model.dart';
 import 'package:memorise_mobile/ui/home/view_models/home_view_model.dart';
+import 'package:memorise_mobile/ui/home/view_models/memory_detail_screen_view_model.dart';
 import 'package:memorise_mobile/ui/home/view_models/my_memories_screen_view_model.dart';
 import 'package:memorise_mobile/ui/user/view_models/edit_user_view_model.dart';
 import 'package:memorise_mobile/ui/user/view_models/friend_add_row_view_model.dart';
@@ -72,10 +73,12 @@ void main() async {
           create: (context) => LogoutViewModel(context.read<AuthRepository>()),
         ),
         ChangeNotifierProvider(
-          create: (context) => MemoryViewModel(
-            context.read<MemoryRepository>(),
-            context.read<AuthRepository>(),
-          ),
+          create: (context) =>
+              MemoryViewModel(context.read<MemoryRepository>()),
+        ),
+        ChangeNotifierProvider(
+          create: (context) =>
+              MemoryDetailViewModel(context.read<MemoryRepository>()),
         ),
       ],
       child: const MemoriseApp(),

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:memorise_mobile/domain/models/memory_model.dart';
 import 'package:memorise_mobile/domain/models/responses.dart';
 
 class ApiService {
@@ -97,7 +98,7 @@ class ApiService {
   Future<PaginatedMemoryResponse> getMemories(
     String userId,
     String endpoint, {
-    int page = 1,
+    int page = 0,
     int pageSize = 9,
   }) async {
     try {
@@ -105,11 +106,19 @@ class ApiService {
         '$endpoint/$userId',
         queryParameters: {'page': page, 'pageSize': pageSize},
       );
-
       // Using your existing PaginatedMemoryResponse model
       return PaginatedMemoryResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Failed to load memories: ${e.message}');
+    }
+  }
+
+  Future<Memory> getMemoryDetails(String memoryId) async {
+    try {
+      final response = await _dio.get('/memories/$memoryId');
+      return Memory.fromJson(response.data);
+    } on DioException catch (e) {
+      throw Exception('Failed to load memory details: ${e.message}');
     }
   }
 }
