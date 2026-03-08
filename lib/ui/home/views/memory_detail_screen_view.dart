@@ -50,35 +50,31 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // 1. MATERIAL 3 SLIVER APP BAR
           SliverAppBar(
             expandedHeight: 320,
             pinned: true,
             stretch: true,
-            // M3 uses a specific surface tint when scrolled
             surfaceTintColor: colorScheme.surface,
+            // HIER: Die Actions hinzufügen
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.edit),
+                onPressed: () {
+                  // Deine Edit-Logik hier
+                },
+              ),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 memory.title,
                 style: textTheme.titleLarge?.copyWith(
-                  color: Colors.white, // Keep white for contrast against images
                   fontWeight: FontWeight.bold,
+                  decorationColor: colorScheme.surfaceContainer,
                 ),
               ),
               background: Stack(
                 fit: StackFit.expand,
-                children: [
-                  Image.network(memory.titlePic, fit: BoxFit.cover),
-                  const DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Colors.transparent, Colors.black87],
-                      ),
-                    ),
-                  ),
-                ],
+                children: [Image.network(memory.titlePic, fit: BoxFit.cover)],
               ),
             ),
           ),
@@ -101,8 +97,8 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
                       const SizedBox(width: 12),
                       _buildM3Action(
                         context,
-                        icon: Icons.person_add_outlined,
-                        label: "Invite",
+                        icon: Icons.camera,
+                        label: "View Photos",
                         onTap: () => print("Invite Tapped"),
                       ),
                     ],
@@ -142,6 +138,7 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
                   (vm.attendees == null || vm.attendees!.isEmpty)
                       ? _buildEmptyAttendeesState(context)
                       : _buildAttendeesList(context, vm.attendees!),
+
                   // 5. MAP SECTION (M3 Container style)
                   if (memory.latitude != null) ...[
                     Text(
@@ -241,9 +238,35 @@ Widget _buildAttendeesList(
     height: 90,
     child: ListView.builder(
       scrollDirection: Axis.horizontal,
-      itemCount: attendees.length,
+      // Wir fügen +1 für den Invite-Button hinzu
+      itemCount: attendees.length + 1,
       itemBuilder: (context, index) {
+        if (index == attendees.length) {
+          return Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: Column(
+              children: [
+                InkWell(
+                  onTap: () => print("Invite Tapped"),
+                  borderRadius: BorderRadius.circular(28),
+                  child: CircleAvatar(
+                    radius: 28,
+                    backgroundColor: colorScheme.surfaceContainerHighest,
+                    child: Icon(
+                      Icons.person_add_outlined,
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text("Invite", style: textTheme.labelMedium),
+              ],
+            ),
+          );
+        }
+
         final attendee = attendees[index];
+
         return Padding(
           padding: const EdgeInsets.only(right: 20),
           child: Column(
