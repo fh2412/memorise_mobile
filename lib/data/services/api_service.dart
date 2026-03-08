@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:memorise_mobile/domain/models/friends_model.dart';
 import 'package:memorise_mobile/domain/models/memory_model.dart';
 import 'package:memorise_mobile/domain/models/responses.dart';
 
@@ -119,6 +120,27 @@ class ApiService {
       return Memory.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Failed to load memory details: ${e.message}');
+    }
+  }
+
+  Future<List<MemoryAttendee>> getMemoryDetailsFriends(
+    String userId,
+    String memoryId,
+  ) async {
+    try {
+      final response = await _dio.get('/memories/$memoryId/$userId/friends');
+
+      if (response.data is List) {
+        return (response.data as List)
+            .map(
+              (item) => MemoryAttendee.fromJson(item as Map<String, dynamic>),
+            )
+            .toList();
+      }
+
+      return []; // Return empty list if data is unexpectedly not a list
+    } on DioException catch (e) {
+      throw Exception('Failed to load memory friends: ${e.message}');
     }
   }
 }

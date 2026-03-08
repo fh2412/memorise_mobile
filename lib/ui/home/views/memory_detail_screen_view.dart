@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:memorise_mobile/ui/home/view_models/memory_detail_screen_view_model.dart';
+import 'package:memorise_mobile/domain/models/friends_model.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:memorise_mobile/ui/home/view_models/memory_detail_screen_view_model.dart';
 
 class MemoryDetailScreen extends StatefulWidget {
-  final int memoryId; // Using int to match your Memory model
+  final int memoryId;
 
   const MemoryDetailScreen({super.key, required this.memoryId});
 
@@ -16,7 +17,6 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
   @override
   void initState() {
     super.initState();
-    // Use microtask or addPostFrameCallback to trigger the fetch after the first build
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<MemoryDetailViewModel>().fetchMemoryDetails(
         widget.memoryId.toString(),
@@ -26,7 +26,11 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Watch the ViewModel for changes
+    // Material 3 Theme Access
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     final vm = context.watch<MemoryDetailViewModel>();
 
     if (vm.isLoading) {
@@ -46,16 +50,18 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // 1. COLLAPSING HEADER (Using titlePic)
+          // 1. MATERIAL 3 SLIVER APP BAR
           SliverAppBar(
             expandedHeight: 320,
             pinned: true,
             stretch: true,
+            // M3 uses a specific surface tint when scrolled
+            surfaceTintColor: colorScheme.surface,
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 memory.title,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: textTheme.titleLarge?.copyWith(
+                  color: Colors.white, // Keep white for contrast against images
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -63,13 +69,12 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
                 fit: StackFit.expand,
                 children: [
                   Image.network(memory.titlePic, fit: BoxFit.cover),
-                  // Dark overlay to make the title readable
                   const DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [Colors.transparent, Colors.black54],
+                        colors: [Colors.transparent, Colors.black87],
                       ),
                     ),
                   ),
@@ -84,22 +89,20 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 2. PRIMARY ACTIONS (Add Photos & Invite)
+                  // 2. PRIMARY ACTIONS (Using M3 Tonal Buttons)
                   Row(
                     children: [
-                      _buildActionChip(
+                      _buildM3Action(
                         context,
-                        icon: Icons.add_a_photo,
+                        icon: Icons.add_a_photo_outlined,
                         label: "Add Photos",
-                        color: Colors.indigo,
                         onTap: () => print("Add Photos Tapped"),
                       ),
                       const SizedBox(width: 12),
-                      _buildActionChip(
+                      _buildM3Action(
                         context,
-                        icon: Icons.person_add,
+                        icon: Icons.person_add_outlined,
                         label: "Invite",
-                        color: Colors.teal,
                         onTap: () => print("Invite Tapped"),
                       ),
                     ],
@@ -110,72 +113,71 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
                   // 3. DESCRIPTION & INFO
                   Text(
                     DateFormat('EEEE, MMM d, yyyy').format(memory.memoryDate),
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodySmall?.copyWith(letterSpacing: 1.2),
+                    style: textTheme.labelMedium?.copyWith(
+                      color: colorScheme.secondary,
+                      letterSpacing: 0.5,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Text(
                     memory.text,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      height: 1.6,
-                      color: Colors.black87,
+                    style: textTheme.bodyLarge?.copyWith(
+                      color: colorScheme.onSurface,
+                      height: 1.5,
                     ),
                   ),
 
-                  const Divider(height: 48),
+                  const Divider(height: 64, thickness: 1),
 
-                  // 4. THE FRIENDS LIST
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "With ${memory.username}",
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      TextButton(
-                        onPressed: () {},
-                        child: const Text("Edit Memory"),
-                      ),
-                    ],
+                  // 4. THE ATTENDEES SECTION
+                  Text(
+                    "Who was there",
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  // Placeholder for the friends/users list
-                  CircleAvatar(radius: 24, child: Text(memory.username[0])),
+                  const SizedBox(height: 16),
 
-                  const SizedBox(height: 32),
-
-                  // 5. MAP SECTION
+                  // Logic to check for null or empty list
+                  (vm.attendees == null || vm.attendees!.isEmpty)
+                      ? _buildEmptyAttendeesState(context)
+                      : _buildAttendeesList(context, vm.attendees!),
+                  // 5. MAP SECTION (M3 Container style)
                   if (memory.latitude != null) ...[
-                    const Text(
+                    Text(
                       "Location",
-                      style: TextStyle(
+                      style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        fontSize: 18,
                       ),
                     ),
                     const SizedBox(height: 16),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        height: 200,
-                        width: double.infinity,
-                        color: Colors.grey[200],
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.map,
-                                size: 40,
-                                color: Colors.grey,
+                    Container(
+                      height: 200,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        // M3 "Surface Container" color
+                        color: colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(
+                          24,
+                        ), // M3 uses larger radii
+                      ),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.map_outlined,
+                              size: 40,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              "Lat: ${memory.latitude}, Lng: ${memory.longitude}",
+                              style: textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
                               ),
-                              Text(
-                                "Lat: ${memory.latitude}, Lng: ${memory.longitude}",
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -190,39 +192,120 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
     );
   }
 
-  Widget _buildActionChip(
+  Widget _buildM3Action(
     BuildContext context, {
     required IconData icon,
     required String label,
-    required Color color,
     required VoidCallback onTap,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: color.withOpacity(0.3)),
-          ),
-          child: Column(
-            children: [
-              Icon(icon, color: color),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  color: color,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
+      child: Material(
+        color: colorScheme.secondaryContainer,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Column(
+              children: [
+                Icon(icon, color: colorScheme.onSecondaryContainer),
+                const SizedBox(height: 8),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: colorScheme.onSecondaryContainer,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+}
+
+Widget _buildAttendeesList(
+  BuildContext context,
+  List<MemoryAttendee> attendees,
+) {
+  final textTheme = Theme.of(context).textTheme;
+  final colorScheme = Theme.of(context).colorScheme;
+
+  return SizedBox(
+    height: 90,
+    child: ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: attendees.length,
+      itemBuilder: (context, index) {
+        final attendee = attendees[index];
+        return Padding(
+          padding: const EdgeInsets.only(right: 20),
+          child: Column(
+            children: [
+              CircleAvatar(
+                radius: 28,
+                backgroundColor: colorScheme.primaryContainer,
+                backgroundImage: attendee.profilePic != null
+                    ? NetworkImage(attendee.profilePic!)
+                    : null,
+                child: attendee.profilePic == null
+                    ? Text(
+                        attendee.initials,
+                        style: TextStyle(color: colorScheme.onPrimaryContainer),
+                      )
+                    : null,
+              ),
+              const SizedBox(height: 6),
+              Text(attendee.name.split(' ')[0], style: textTheme.labelMedium),
+            ],
+          ),
+        );
+      },
+    ),
+  );
+}
+
+Widget _buildEmptyAttendeesState(BuildContext context) {
+  final colorScheme = Theme.of(context).colorScheme;
+  final textTheme = Theme.of(context).textTheme;
+
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(24),
+    decoration: BoxDecoration(
+      color: colorScheme.surfaceContainerLow,
+      borderRadius: BorderRadius.circular(24),
+      border: Border.all(
+        color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+        style: BorderStyle.solid,
+      ),
+    ),
+    child: Column(
+      children: [
+        Icon(Icons.group_add_outlined, size: 32, color: colorScheme.primary),
+        const SizedBox(height: 12),
+        Text(
+          "Memories are better together",
+          style: textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          "Tag the friends who shared this moment with you.",
+          textAlign: TextAlign.center,
+          style: textTheme.bodySmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
+    ),
+  );
 }

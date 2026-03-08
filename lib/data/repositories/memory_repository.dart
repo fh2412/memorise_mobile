@@ -1,4 +1,5 @@
 import 'package:memorise_mobile/data/services/api_service.dart';
+import 'package:memorise_mobile/domain/models/friends_model.dart';
 import 'package:memorise_mobile/domain/models/memory_model.dart';
 import 'package:memorise_mobile/domain/models/responses.dart';
 
@@ -38,5 +39,18 @@ class MemoryRepository {
 
   Future<Memory> fetchMemoryDetails({required String memoryId}) async {
     return await _memoryService.getMemoryDetails(memoryId);
+  }
+
+  Future<List<MemoryAttendee>> fetchMemoryDetailsFriends({
+    required String userId,
+    required String memoryId,
+  }) async {
+    try {
+      // Calling the API service method updated above
+      return await _memoryService.getMemoryDetailsFriends(userId, memoryId);
+    } catch (e) {
+      // Re-throw or handle repository-specific logging here
+      rethrow;
+    }
   }
 }
