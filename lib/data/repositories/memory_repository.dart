@@ -2,6 +2,7 @@ import 'package:memorise_mobile/data/services/api_service.dart';
 import 'package:memorise_mobile/domain/models/friends_model.dart';
 import 'package:memorise_mobile/domain/models/memory_model.dart';
 import 'package:memorise_mobile/domain/models/responses.dart';
+import 'package:memorise_mobile/domain/models/user_model.dart';
 
 class MemoryRepository {
   final ApiService _memoryService;
@@ -52,5 +53,12 @@ class MemoryRepository {
       // Re-throw or handle repository-specific logging here
       rethrow;
     }
+  }
+
+  Future<MemoriseUser> fetchMemoryCreator({required String userId}) async {
+    final Map<String, dynamic> rawData = await _memoryService.getUserData(
+      userId,
+    );
+    return MemoriseUser.fromJson(rawData);
   }
 }

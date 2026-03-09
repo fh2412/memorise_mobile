@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memorise_mobile/domain/models/friends_model.dart';
+import 'package:memorise_mobile/domain/models/user_model.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:memorise_mobile/ui/home/view_models/memory_detail_screen_view_model.dart';
@@ -55,12 +56,11 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
             pinned: true,
             stretch: true,
             surfaceTintColor: colorScheme.surface,
-            // HIER: Die Actions hinzufügen
             actions: [
               IconButton(
                 icon: const Icon(Icons.edit),
                 onPressed: () {
-                  // Deine Edit-Logik hier
+                  // Your Edit Logic
                 },
               ),
             ],
@@ -69,12 +69,33 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
                 memory.title,
                 style: textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
-                  decorationColor: colorScheme.surfaceContainer,
+                  color: colorScheme.primary,
+                  shadows: const [
+                    Shadow(blurRadius: 5.0, color: Colors.black26),
+                  ],
                 ),
               ),
               background: Stack(
                 fit: StackFit.expand,
-                children: [Image.network(memory.titlePic, fit: BoxFit.cover)],
+                children: [
+                  Image.network(memory.titlePic, fit: BoxFit.cover),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          theme.colorScheme.surfaceContainer.withValues(
+                            alpha: 0.6,
+                          ),
+                          theme.colorScheme.surfaceContainer,
+                        ],
+                        stops: const [0.0, 0.7, 1.0],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -111,6 +132,7 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
                     DateFormat('EEEE, MMM d, yyyy').format(memory.memoryDate),
                     style: textTheme.labelMedium?.copyWith(
                       color: colorScheme.secondary,
+                      fontWeight: FontWeight.bold,
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -127,17 +149,14 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
 
                   // 4. THE ATTENDEES SECTION
                   Text(
-                    "Who was there",
+                    "There with you",
                     style: textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 16),
 
-                  // Logic to check for null or empty list
-                  (vm.attendees == null || vm.attendees!.isEmpty)
-                      ? _buildEmptyAttendeesState(context)
-                      : _buildAttendeesList(context, vm.attendees!),
+                  _buildAttendeesList(context, vm.attendees!, vm.creator!),
 
                   // 5. MAP SECTION (M3 Container style)
                   if (memory.latitude != null) ...[
@@ -230,6 +249,7 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
 Widget _buildAttendeesList(
   BuildContext context,
   List<MemoryAttendee> attendees,
+  MemoriseUser creator,
 ) {
   final textTheme = Theme.of(context).textTheme;
   final colorScheme = Theme.of(context).colorScheme;
@@ -238,10 +258,35 @@ Widget _buildAttendeesList(
     height: 90,
     child: ListView.builder(
       scrollDirection: Axis.horizontal,
-      // Wir fügen +1 für den Invite-Button hinzu
-      itemCount: attendees.length + 1,
+      // Wir fügen +2 für Creator und Invite-Button
+      itemCount: attendees.length + 2,
       itemBuilder: (context, index) {
-        if (index == attendees.length) {
+        if (index == 0) {
+          return Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: Column(
+              children: [
+                CircleAvatar(
+                  radius: 28,
+                  backgroundColor: colorScheme.primaryContainer,
+                  backgroundImage: creator.profilePic != null
+                      ? NetworkImage(creator.profilePic!)
+                      : null,
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  creator.name.split(' ')[0],
+                  style: textTheme.labelMedium?.copyWith(
+                    color: colorScheme.secondary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        if (index == attendees.length + 1) {
           return Padding(
             padding: const EdgeInsets.only(right: 20),
             child: Column(
@@ -265,7 +310,7 @@ Widget _buildAttendeesList(
           );
         }
 
-        final attendee = attendees[index];
+        final attendee = attendees[index - 1];
 
         return Padding(
           padding: const EdgeInsets.only(right: 20),

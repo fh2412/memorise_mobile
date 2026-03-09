@@ -48,7 +48,7 @@ class MemoriseUser {
       dob: json['dob'] ?? '01-01-1001',
       instagram: json['instagram'] ?? '',
       locationId: json['location_id'] ?? 0,
-      profilePic: json['profilepic'] ?? '',
+      profilePic: json['profilepic'],
       companyId: json['company_id'] ?? 0,
     );
   }

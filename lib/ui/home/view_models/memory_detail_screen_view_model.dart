@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:memorise_mobile/data/repositories/memory_repository.dart';
 import 'package:memorise_mobile/domain/models/friends_model.dart';
 import 'package:memorise_mobile/domain/models/memory_model.dart';
+import 'package:memorise_mobile/domain/models/user_model.dart';
 
 class MemoryDetailViewModel extends ChangeNotifier {
   late final MemoryRepository _memoryRepository;
@@ -12,6 +13,9 @@ class MemoryDetailViewModel extends ChangeNotifier {
 
   List<MemoryAttendee>? _attendees;
   List<MemoryAttendee>? get attendees => _attendees;
+
+  MemoriseUser? _creator;
+  MemoriseUser? get creator => _creator;
 
   final userId = FirebaseAuth.instance.currentUser?.uid;
 
@@ -23,7 +27,6 @@ class MemoryDetailViewModel extends ChangeNotifier {
 
   MemoryDetailViewModel(this._memoryRepository);
 
-  // Method to fetch the specific memory details
   Future<void> fetchMemoryDetails(String memoryId) async {
     _isLoading = true;
     _errorMessage = null;
@@ -42,6 +45,9 @@ class MemoryDetailViewModel extends ChangeNotifier {
         userId: userId!,
         memoryId: memoryId,
       );
+
+      final creatorId = _selectedMemory!.userId;
+      _creator = await _memoryRepository.fetchMemoryCreator(userId: creatorId);
     } catch (e) {
       debugPrint(
         "Error loading memory: $e",
