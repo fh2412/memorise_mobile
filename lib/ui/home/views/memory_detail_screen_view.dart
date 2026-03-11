@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memorise_mobile/domain/models/friends_model.dart';
 import 'package:memorise_mobile/domain/models/user_model.dart';
+import 'package:memorise_mobile/ui/memories/views/photo_gallery_view.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:memorise_mobile/ui/home/view_models/memory_detail_screen_view_model.dart';
@@ -120,7 +121,16 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
                         context,
                         icon: Icons.camera,
                         label: "View Photos",
-                        onTap: () => print("Invite Tapped"),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PhotoGalleryView(
+                                imageId: vm.selectedMemory!.imageUrl,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),

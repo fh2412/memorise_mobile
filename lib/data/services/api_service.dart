@@ -117,6 +117,8 @@ class ApiService {
   Future<Memory> getMemoryDetails(String memoryId) async {
     try {
       final response = await _dio.get('/memories/$memoryId');
+      print(response);
+
       return Memory.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Failed to load memory details: ${e.message}');
@@ -129,7 +131,6 @@ class ApiService {
   ) async {
     try {
       final response = await _dio.get('/memories/$memoryId/$userId/friends');
-
       if (response.data is List) {
         return (response.data as List)
             .map(
