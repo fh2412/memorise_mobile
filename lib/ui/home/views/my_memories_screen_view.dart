@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:memorise_mobile/domain/models/memory_model.dart';
 import 'package:memorise_mobile/ui/core/view/special_create_button_view.dart';
@@ -214,7 +215,22 @@ class _MemoryCard extends StatelessWidget {
                 color: Colors.blueGrey[50],
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Icons.image, color: Colors.blueGrey),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: CachedNetworkImage(
+                  imageUrl: memory.titlePic,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => const Center(
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
+                  errorWidget: (context, url, error) =>
+                      const Icon(Icons.image, color: Colors.blueGrey),
+                ),
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(
