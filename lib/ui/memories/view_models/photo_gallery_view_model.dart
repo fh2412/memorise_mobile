@@ -18,7 +18,6 @@ class PhotoGalleryViewModel extends ChangeNotifier {
         "memories/$imageId",
       );
       final res = await storageRef.listAll();
-      print(res);
 
       _images = await Future.wait(
         res.items.map((itemRef) async {

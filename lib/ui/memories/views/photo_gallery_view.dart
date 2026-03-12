@@ -3,6 +3,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:memorise_mobile/domain/models/photo_model.dart';
 import 'package:memorise_mobile/ui/memories/view_models/photo_gallery_view_model.dart';
+import 'package:memorise_mobile/ui/memories/views/full_screen_gallery_view.dart';
 import 'package:provider/provider.dart';
 
 class PhotoGalleryView extends StatefulWidget {
@@ -49,7 +50,20 @@ class _PhotoGalleryViewState extends State<PhotoGalleryView> {
               itemCount: vm.images.length,
               itemBuilder: (context, index) {
                 final image = vm.images[index];
-                return _PhotoTile(image: image);
+                return _PhotoTile(
+                  image: image,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FullScreenGallery(
+                          images: vm.images,
+                          initialIndex: index,
+                        ),
+                      ),
+                    );
+                  },
+                );
               },
             );
           },
@@ -61,37 +75,49 @@ class _PhotoGalleryViewState extends State<PhotoGalleryView> {
 
 class _PhotoTile extends StatelessWidget {
   final MemoryPhoto image;
-  const _PhotoTile({required this.image});
+  final VoidCallback onTap;
+
+  const _PhotoTile({required this.image, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: Stack(
-        children: [
-          CachedNetworkImage(
-            imageUrl: image.url,
-            // Use the metadata aspect ratio to avoid layout jumps
-            placeholder: (context, url) => AspectRatio(
-              aspectRatio: image.aspectRatio,
-              child: Container(color: Colors.grey[200]),
-            ),
-            fit: BoxFit.cover,
-          ),
-          if (image.isStarred)
-            Positioned(
-              top: 8,
-              right: 8,
-              child: Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.4),
-                  shape: BoxShape.circle,
+    return GestureDetector(
+      onTap: onTap, // Trigger navigation
+      child: Hero(
+        tag: image.url, // This matches the tag in FullScreenGallery
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Stack(
+            children: [
+              CachedNetworkImage(
+                imageUrl: image.url,
+                // Use the metadata aspect ratio to avoid layout jumps
+                placeholder: (context, url) => AspectRatio(
+                  aspectRatio: image.aspectRatio,
+                  child: Container(color: Colors.grey[200]),
                 ),
-                child: const Icon(Icons.star, color: Colors.yellow, size: 18),
+                fit: BoxFit.cover,
               ),
-            ),
-        ],
+              if (image.isStarred)
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.4),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.star,
+                      color: Colors.yellow,
+                      size: 18,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }
