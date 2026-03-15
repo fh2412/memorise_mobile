@@ -4,14 +4,17 @@ import 'package:memorise_mobile/core/router.dart';
 import 'package:memorise_mobile/core/theme.dart';
 import 'package:memorise_mobile/data/repositories/auth_repository.dart';
 import 'package:memorise_mobile/data/repositories/memory_repository.dart';
+import 'package:memorise_mobile/data/repositories/photo_repository.dart';
 import 'package:memorise_mobile/data/repositories/user_repository.dart';
 import 'package:memorise_mobile/data/services/api_service.dart';
 import 'package:memorise_mobile/data/services/auth_service.dart';
+import 'package:memorise_mobile/data/services/upload_service.dart';
 import 'package:memorise_mobile/ui/auth/view_models/login_view_model.dart';
 import 'package:memorise_mobile/ui/auth/view_models/logout_view_model.dart';
 import 'package:memorise_mobile/ui/home/view_models/home_view_model.dart';
 import 'package:memorise_mobile/ui/home/view_models/memory_detail_screen_view_model.dart';
 import 'package:memorise_mobile/ui/home/view_models/my_memories_screen_view_model.dart';
+import 'package:memorise_mobile/ui/memories/view_models/upload_view_model.dart';
 import 'package:memorise_mobile/ui/user/view_models/edit_user_view_model.dart';
 import 'package:memorise_mobile/ui/user/view_models/friend_add_row_view_model.dart';
 import 'package:memorise_mobile/ui/user/view_models/friend_list_view_model.dart';
@@ -30,9 +33,13 @@ void main() async {
         // 1. Initialize Services
         Provider(create: (_) => AuthService()),
         Provider(create: (_) => ApiService()),
+        Provider(create: (_) => UploadService()),
         // 2. Initialize Repositories (Inject Service)
         ProxyProvider<AuthService, AuthRepository>(
           update: (_, service, __) => AuthRepository(service),
+        ),
+        Provider(
+          create: (context) => PhotoRepository(context.read<UploadService>()),
         ),
         Provider(
           create: (context) => MemoryRepository(context.read<ApiService>()),
@@ -79,6 +86,9 @@ void main() async {
         ChangeNotifierProvider(
           create: (context) =>
               MemoryDetailViewModel(context.read<MemoryRepository>()),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => UploadViewModel(context.read<PhotoRepository>()),
         ),
       ],
       child: const MemoriseApp(),

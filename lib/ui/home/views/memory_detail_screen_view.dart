@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:memorise_mobile/domain/models/friends_model.dart';
 import 'package:memorise_mobile/domain/models/user_model.dart';
 import 'package:memorise_mobile/ui/memories/views/photo_gallery_view.dart';
+import 'package:memorise_mobile/ui/memories/views/upload_view.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:memorise_mobile/ui/home/view_models/memory_detail_screen_view_model.dart';
@@ -114,7 +115,15 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
                         context,
                         icon: Icons.add_a_photo_outlined,
                         label: "Add Photos",
-                        onTap: () => print("Add Photos Tapped"),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  UploadView(memoryId: widget.memoryId),
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(width: 12),
                       _buildM3Action(
@@ -279,9 +288,7 @@ Widget _buildAttendeesList(
                 CircleAvatar(
                   radius: 28,
                   backgroundColor: colorScheme.primaryContainer,
-                  backgroundImage: creator.profilePic != null
-                      ? NetworkImage(creator.profilePic!)
-                      : null,
+                  backgroundImage: NetworkImage(creator.profilePic),
                 ),
                 const SizedBox(height: 6),
                 Text(
@@ -345,45 +352,6 @@ Widget _buildAttendeesList(
           ),
         );
       },
-    ),
-  );
-}
-
-Widget _buildEmptyAttendeesState(BuildContext context) {
-  final colorScheme = Theme.of(context).colorScheme;
-  final textTheme = Theme.of(context).textTheme;
-
-  return Container(
-    width: double.infinity,
-    padding: const EdgeInsets.all(24),
-    decoration: BoxDecoration(
-      color: colorScheme.surfaceContainerLow,
-      borderRadius: BorderRadius.circular(24),
-      border: Border.all(
-        color: colorScheme.outlineVariant.withValues(alpha: 0.5),
-        style: BorderStyle.solid,
-      ),
-    ),
-    child: Column(
-      children: [
-        Icon(Icons.group_add_outlined, size: 32, color: colorScheme.primary),
-        const SizedBox(height: 12),
-        Text(
-          "Memories are better together",
-          style: textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: colorScheme.onSurface,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          "Tag the friends who shared this moment with you.",
-          textAlign: TextAlign.center,
-          style: textTheme.bodySmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
-      ],
     ),
   );
 }

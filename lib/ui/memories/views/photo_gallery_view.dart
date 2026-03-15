@@ -7,7 +7,7 @@ import 'package:memorise_mobile/ui/memories/views/full_screen_gallery_view.dart'
 import 'package:provider/provider.dart';
 
 class PhotoGalleryView extends StatefulWidget {
-  final String imageId; // Parent now only passes this
+  final String imageId;
 
   const PhotoGalleryView({super.key, required this.imageId});
 
