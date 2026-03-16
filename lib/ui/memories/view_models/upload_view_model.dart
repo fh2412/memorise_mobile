@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:memorise_mobile/data/repositories/photo_repository.dart';
 import 'package:image_picker/image_picker.dart';
@@ -9,7 +9,7 @@ class UploadViewModel extends ChangeNotifier {
   UploadViewModel(this._repository);
   final ImagePicker _picker = ImagePicker();
 
-  List<XFile> _selectedPhotos = [];
+  final List<XFile> _selectedPhotos = [];
   bool _isUploading = false;
 
   List<XFile> get selectedPhotos => _selectedPhotos;
@@ -34,10 +34,19 @@ class UploadViewModel extends ChangeNotifier {
     _isUploading = true;
     notifyListeners();
 
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+
     try {
-      // Pass XFiles to the repository
-      await _repository.uploadBatch(_selectedPhotos.cast<File>(), memoryId);
+      await _repository.uploadAndSync(
+        memoryId: memoryId.toString(),
+        files: _selectedPhotos,
+        userId: userId!,
+      );
       _selectedPhotos.clear();
+      // You could trigger a success message or navigation here
+    } catch (e) {
+      // Handle error (e.g., show a SnackBar in the View)
+      rethrow;
     } finally {
       _isUploading = false;
       notifyListeners();

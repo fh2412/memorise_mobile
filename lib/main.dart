@@ -38,8 +38,9 @@ void main() async {
         ProxyProvider<AuthService, AuthRepository>(
           update: (_, service, __) => AuthRepository(service),
         ),
-        Provider(
-          create: (context) => PhotoRepository(context.read<UploadService>()),
+        ProxyProvider2<UploadService, ApiService, PhotoRepository>(
+          update: (context, uploadService, apiService, previous) =>
+              PhotoRepository(uploadService, apiService),
         ),
         Provider(
           create: (context) => MemoryRepository(context.read<ApiService>()),

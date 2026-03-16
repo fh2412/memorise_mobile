@@ -144,4 +144,16 @@ class ApiService {
       throw Exception('Failed to load memory friends: ${e.message}');
     }
   }
+
+  Future<void> updatePictureCount(String memoryId, int incrementBy) async {
+    try {
+      await _dio.put(
+        '/memories/picturecount/$memoryId',
+        data: {'incrementBy': incrementBy},
+      );
+    } on DioException catch (e) {
+      debugPrint("API Error: ${e.response?.data}");
+      throw e.response?.data['message'] ?? "Failed to update picture count";
+    }
+  }
 }
