@@ -147,9 +147,9 @@ class ApiService {
 
   Future<void> updatePictureCount(String memoryId, int incrementBy) async {
     try {
-      await _dio.put(
-        '/memories/picturecount/$memoryId',
-        data: {'incrementBy': incrementBy},
+      await _dio.post(
+        '/memories/picturecount/$memoryId/increment',
+        data: {'increment': incrementBy},
       );
     } on DioException catch (e) {
       debugPrint("API Error: ${e.response?.data}");
