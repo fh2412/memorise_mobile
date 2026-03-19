@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:memorise_mobile/data/services/snackbar_service.dart';
 import '../../../data/repositories/user_repository.dart';
 import '../../../domain/models/user_model.dart';
 
@@ -37,7 +38,11 @@ class FriendListViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> handleRequest(String friendId, bool accept) async {
+  Future<bool> handleRequest(
+    String friendId,
+    String snackBarText,
+    bool accept,
+  ) async {
     final firebaseUid = FirebaseAuth.instance.currentUser?.uid;
     if (firebaseUid == null) return false;
 
@@ -54,6 +59,7 @@ class FriendListViewModel extends ChangeNotifier {
         incomingRequests.removeWhere((f) => f.userId == friendId);
       }
       notifyListeners();
+      SnackBarService.show(snackBarText);
       return true;
     } catch (e) {
       error = "Action failed: $e";
@@ -63,7 +69,8 @@ class FriendListViewModel extends ChangeNotifier {
   }
 
   Future<bool> removeFriendship(
-    String friendId, {
+    String friendId,
+    String friendName, {
     bool isRequest = false,
   }) async {
     final firebaseUid = FirebaseAuth.instance.currentUser?.uid;
@@ -80,6 +87,7 @@ class FriendListViewModel extends ChangeNotifier {
       }
 
       notifyListeners();
+      SnackBarService.show("$friendName removed from friends.");
       return true;
     } catch (e) {
       error = "Removal failed: $e";

@@ -118,22 +118,9 @@ class _LoginViewState extends State<LoginView> {
   Future<void> _handleLogin() async {
     final vm = context.read<LoginViewModel>();
 
-    final success = await vm.login(
+    await vm.login(
       _emailController.text.trim(),
       _passwordController.text.trim(),
     );
-
-    if (!success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            vm.errorMessage ?? "Login Failed",
-            style: TextStyle(color: Theme.of(context).colorScheme.onError),
-          ),
-          backgroundColor: Theme.of(context).colorScheme.error,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
   }
 }

@@ -33,14 +33,6 @@ class _FriendAddRowState extends State<FriendAddRow> {
 
     if (vm.errorMessage == null && mounted) {
       _confettiController.play();
-
-      // Optional: Show a success snackbar
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Request sent! 🎉"),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
     }
   }
 

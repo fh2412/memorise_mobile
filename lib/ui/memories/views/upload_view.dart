@@ -199,7 +199,7 @@ class _UploadViewState extends State<UploadView> {
 
                         Navigator.of(context).pop();
                       } catch (_) {
-                        // The ViewModel already showed the error SnackBar
+                        // The ViewModel already showed the error
                       }
                     },
               child: vm.isUploading

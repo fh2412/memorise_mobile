@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:memorise_mobile/data/services/snackbar_service.dart';
 import '../../../data/repositories/auth_repository.dart';
 
 class LoginViewModel extends ChangeNotifier {
@@ -19,16 +20,19 @@ class LoginViewModel extends ChangeNotifier {
       await _repository.login(email, password);
       isLoading = false;
       notifyListeners();
+      SnackBarService.show("Welcome back to Memorise!");
       return true;
     } on FirebaseAuthException catch (e) {
       errorMessage = _mapFirebaseError(e.code);
       isLoading = false;
       notifyListeners();
+      SnackBarService.show(errorMessage!, isError: true);
       return false;
     } catch (e) {
       errorMessage = "An unexpected error occurred. Please try again.";
       isLoading = false;
       notifyListeners();
+      SnackBarService.show(errorMessage!, isError: true);
       return false;
     }
   }

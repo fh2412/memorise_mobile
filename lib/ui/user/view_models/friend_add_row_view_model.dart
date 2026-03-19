@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:memorise_mobile/data/repositories/user_repository.dart';
+import 'package:memorise_mobile/data/services/snackbar_service.dart';
 
 class FriendAddViewModel extends ChangeNotifier {
   final TextEditingController codeController = TextEditingController();
@@ -36,13 +37,14 @@ class FriendAddViewModel extends ChangeNotifier {
       receiverCode,
     );
 
-    if (result.message == 'Friendship request sent successfully') {
+    if (result.message == 'Request sent! 🎉') {
       _errorMessage = null;
       codeController.clear();
     }
 
     _isLoading = false;
     notifyListeners();
+    SnackBarService.show(result.message);
   }
 
   void updateCode(String code) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memorise_mobile/data/repositories/user_repository.dart';
+import 'package:memorise_mobile/data/services/snackbar_service.dart';
 
 class EditUserViewModel extends ChangeNotifier {
   final UserRepository _userRepository;
@@ -53,6 +54,7 @@ class EditUserViewModel extends ChangeNotifier {
       });
       isLoading = false;
       notifyListeners();
+      SnackBarService.show("Profile updated successfully!");
       return true;
     } catch (e) {
       errorMessage = e.toString();

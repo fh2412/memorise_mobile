@@ -95,22 +95,11 @@ class _FriendListState extends State<FriendList> {
                       ),
                       onPressed: () async {
                         final vm = context.read<FriendListViewModel>();
-                        final success = await vm.handleRequest(
+                        await vm.handleRequest(
                           friend.userId,
+                          "You now are Freinds with ${friend.name}",
                           true,
                         );
-
-                        if (success && context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                "You are now friends with ${friend.name}!",
-                              ),
-                              backgroundColor: Colors.green,
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        }
                       },
                     ),
                     IconButton(
@@ -120,22 +109,11 @@ class _FriendListState extends State<FriendList> {
                       ),
                       onPressed: () async {
                         final vm = context.read<FriendListViewModel>();
-                        final success = await vm.handleRequest(
+                        await vm.handleRequest(
                           friend.userId,
+                          "Request from ${friend.name} declined.",
                           false,
                         );
-
-                        if (success && context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                "Request from ${friend.name} declined.",
-                              ),
-                              backgroundColor: Colors.black87,
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        }
                       },
                     ),
                   ],
@@ -146,25 +124,14 @@ class _FriendListState extends State<FriendList> {
                     if (value == 'view') {
                       // TODO: Navigate to UserProfileScreen
                       print("Navigate to profile of ${friend.userId}");
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Navigation to profile coming soon!"),
-                        ),
-                      );
                     } else if (value == 'delete') {
-                      final success = await context
+                      await context
                           .read<FriendListViewModel>()
-                          .removeFriendship(friend.userId, isRequest: false);
-
-                      if (success && context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              "${friend.name} removed from friends.",
-                            ),
-                          ),
-                        );
-                      }
+                          .removeFriendship(
+                            friend.userId,
+                            friend.name,
+                            isRequest: false,
+                          );
                     }
                   },
                   itemBuilder: (BuildContext context) => [

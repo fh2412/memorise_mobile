@@ -34,13 +34,6 @@ class UserScreenView extends StatelessWidget {
                         },
                       ),
                     );
-                  } else {
-                    // Optional: Show a message if data isn't loaded yet
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("User data still loading..."),
-                      ),
-                    );
                   }
                 },
               );

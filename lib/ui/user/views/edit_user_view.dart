@@ -31,9 +31,6 @@ class _EditUserDialogState extends State<EditUserDialog> {
     final success = await vm.saveUser(widget.userId);
     if (success && mounted) {
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Profile updated successfully!")),
-      );
     }
   }
 
