@@ -23,7 +23,7 @@ class _UploadViewState extends State<UploadView> {
 
     return Scaffold(
       // Material 3 AppBars are usually transparent/flat by default
-      appBar: AppBar(title: const Text("Add Photos"), centerTitle: true),
+      appBar: AppBar(title: const Text("Add Photos")),
       body: Column(
         children: [
           Expanded(
@@ -70,7 +70,7 @@ class _UploadViewState extends State<UploadView> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  "Start your Memory",
+                  "Upload Photos",
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: colorScheme.onSurface,
                     fontWeight: FontWeight.bold,
@@ -192,15 +192,21 @@ class _UploadViewState extends State<UploadView> {
             child: FilledButton(
               onPressed: (vm.isUploading)
                   ? null
-                  : () => vm.submitMemories(widget.memoryId),
+                  : () async {
+                      try {
+                        await vm.submitMemories(widget.memoryId);
+                        if (!mounted) return;
+
+                        Navigator.of(context).pop();
+                      } catch (_) {
+                        // The ViewModel already showed the error SnackBar
+                      }
+                    },
               child: vm.isUploading
                   ? const SizedBox(
                       height: 20,
                       width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
+                      child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const Text("Upload to Memorise"),
             ),

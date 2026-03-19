@@ -7,9 +7,9 @@ import 'package:memorise_mobile/ui/memories/views/full_screen_gallery_view.dart'
 import 'package:provider/provider.dart';
 
 class PhotoGalleryView extends StatefulWidget {
-  final String imageId;
+  final int memoryId;
 
-  const PhotoGalleryView({super.key, required this.imageId});
+  const PhotoGalleryView({super.key, required this.memoryId});
 
   @override
   State<PhotoGalleryView> createState() => _PhotoGalleryViewState();
@@ -22,7 +22,7 @@ class _PhotoGalleryViewState extends State<PhotoGalleryView> {
   void initState() {
     super.initState();
     _viewModel = PhotoGalleryViewModel();
-    _viewModel.fetchMemoryPhotos(widget.imageId);
+    _viewModel.fetchMemoryPhotos(widget.memoryId);
   }
 
   @override

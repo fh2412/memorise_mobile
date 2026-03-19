@@ -135,7 +135,7 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => PhotoGalleryView(
-                                imageId: vm.selectedMemory!.imageUrl,
+                                memoryId: vm.selectedMemory!.memoryId,
                               ),
                             ),
                           );

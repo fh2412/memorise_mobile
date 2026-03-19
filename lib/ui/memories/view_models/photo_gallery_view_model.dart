@@ -9,13 +9,13 @@ class PhotoGalleryViewModel extends ChangeNotifier {
   bool _isLoading = true;
   bool get isLoading => _isLoading;
 
-  Future<void> fetchMemoryPhotos(String imageId) async {
+  Future<void> fetchMemoryPhotos(int memoryId) async {
     _isLoading = true;
     notifyListeners();
 
     try {
       final storageRef = FirebaseStorage.instance.ref().child(
-        "memories/$imageId",
+        "memories/$memoryId",
       );
       final res = await storageRef.listAll();
 

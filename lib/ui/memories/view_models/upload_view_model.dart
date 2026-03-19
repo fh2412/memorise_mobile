@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:memorise_mobile/data/repositories/photo_repository.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:memorise_mobile/data/services/snackbar_service.dart';
 
 class UploadViewModel extends ChangeNotifier {
   final PhotoRepository _repository;
@@ -43,9 +44,9 @@ class UploadViewModel extends ChangeNotifier {
         userId: userId!,
       );
       _selectedPhotos.clear();
-      // You could trigger a success message or navigation here
+      SnackBarService.show("Memories uploaded successfully!");
     } catch (e) {
-      // Handle error (e.g., show a SnackBar in the View)
+      SnackBarService.show("Upload failed: $e", isError: true);
       rethrow;
     } finally {
       _isUploading = false;

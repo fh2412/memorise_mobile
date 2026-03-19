@@ -8,6 +8,7 @@ import 'package:memorise_mobile/data/repositories/photo_repository.dart';
 import 'package:memorise_mobile/data/repositories/user_repository.dart';
 import 'package:memorise_mobile/data/services/api_service.dart';
 import 'package:memorise_mobile/data/services/auth_service.dart';
+import 'package:memorise_mobile/data/services/snackbar_service.dart';
 import 'package:memorise_mobile/data/services/upload_service.dart';
 import 'package:memorise_mobile/ui/auth/view_models/login_view_model.dart';
 import 'package:memorise_mobile/ui/auth/view_models/logout_view_model.dart';
@@ -104,6 +105,7 @@ class MemoriseApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       routerConfig: AppRouter.router,
+      scaffoldMessengerKey: SnackBarService.messengerKey,
       title: 'Memorise',
       theme: MemoriseTheme.lightTheme,
     );
