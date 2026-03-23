@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:memorise_mobile/domain/models/friends_model.dart';
 import 'package:memorise_mobile/domain/models/user_model.dart';
 import 'package:memorise_mobile/ui/memories/views/photo_gallery_view.dart';
@@ -309,7 +310,7 @@ Widget _buildAttendeesList(
             child: Column(
               children: [
                 InkWell(
-                  onTap: () => print("Invite Tapped"),
+                  onTap: () => context.push('/invite'),
                   borderRadius: BorderRadius.circular(28),
                   child: CircleAvatar(
                     radius: 28,

@@ -19,6 +19,7 @@ import 'package:memorise_mobile/ui/memories/view_models/upload_view_model.dart';
 import 'package:memorise_mobile/ui/user/view_models/edit_user_view_model.dart';
 import 'package:memorise_mobile/ui/user/view_models/friend_add_row_view_model.dart';
 import 'package:memorise_mobile/ui/user/view_models/friend_list_view_model.dart';
+import 'package:memorise_mobile/ui/user/view_models/memory_invite_view_model.dart';
 import 'package:memorise_mobile/ui/user/view_models/user_card_view_model.dart';
 import 'package:memorise_mobile/ui/user/view_models/user_screen_view_model.dart';
 import 'package:provider/provider.dart';
@@ -91,6 +92,10 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (context) => UploadViewModel(context.read<PhotoRepository>()),
+        ),
+        ChangeNotifierProvider(
+          create: (context) =>
+              MemoryInviteViewModel(context.read<UserRepository>()),
         ),
       ],
       child: const MemoriseApp(),
