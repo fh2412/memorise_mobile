@@ -1,30 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:memorise_mobile/data/repositories/user_repository.dart';
+import 'package:memorise_mobile/data/repositories/memory_repository.dart';
 
 class MemoryInviteViewModel extends ChangeNotifier {
-  final UserRepository _userRepository;
+  final MemoryRepository _memoryRepository;
+  MemoryInviteViewModel(this._memoryRepository);
 
-  MemoryInviteViewModel(this._userRepository);
+  String? _inviteToken;
+  String? get inviteToken => _inviteToken;
 
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
+  bool _isTokenLoading = false;
+  bool get isTokenLoading => _isTokenLoading;
 
-  // Placeholder for the friends list or search results
-  final List<dynamic> _searchResults = [];
-  List<dynamic> get searchResults => _searchResults;
+  Future<void> fetchInviteToken(String memoryId) async {
+    // Only fetch if we don't have one yet
+    if (_inviteToken != null || _isTokenLoading) return;
 
-  void setLoading(bool value) {
-    _isLoading = value;
+    _isTokenLoading = true;
     notifyListeners();
-  }
 
-  // Logic for adding friends will go here
-  Future<void> searchUsers(String query) async {
-    setLoading(true);
     try {
-      // _searchResults = await _userRepository.searchUsers(query);
+      _inviteToken = await _memoryRepository.getInviteToken(memoryId);
+    } catch (e) {
+      debugPrint("Error fetching token: $e");
     } finally {
-      setLoading(false);
+      _isTokenLoading = false;
+      notifyListeners();
     }
   }
 }

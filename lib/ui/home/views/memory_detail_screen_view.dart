@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memorise_mobile/domain/models/friends_model.dart';
+import 'package:memorise_mobile/domain/models/memory_model.dart';
 import 'package:memorise_mobile/domain/models/user_model.dart';
 import 'package:memorise_mobile/ui/memories/views/photo_gallery_view.dart';
 import 'package:memorise_mobile/ui/memories/views/upload_view.dart';
@@ -176,7 +177,12 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  _buildAttendeesList(context, vm.attendees!, vm.creator!),
+                  _buildAttendeesList(
+                    context,
+                    vm.attendees!,
+                    vm.creator!,
+                    vm.selectedMemory!,
+                  ),
 
                   // 5. MAP SECTION (M3 Container style)
                   if (memory.latitude != null) ...[
@@ -270,6 +276,7 @@ Widget _buildAttendeesList(
   BuildContext context,
   List<MemoryAttendee> attendees,
   MemoriseUser creator,
+  Memory memory,
 ) {
   final textTheme = Theme.of(context).textTheme;
   final colorScheme = Theme.of(context).colorScheme;
@@ -310,7 +317,10 @@ Widget _buildAttendeesList(
             child: Column(
               children: [
                 InkWell(
-                  onTap: () => context.push('/invite'),
+                  onTap: () => context.pushNamed(
+                    'invite',
+                    pathParameters: {'memoryId': memory.memoryId.toString()},
+                  ),
                   borderRadius: BorderRadius.circular(28),
                   child: CircleAvatar(
                     radius: 28,

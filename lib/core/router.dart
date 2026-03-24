@@ -34,8 +34,12 @@ class AppRouter {
       GoRoute(path: '/login', builder: (context, state) => LoginView()),
       GoRoute(path: '/user', builder: (context, state) => UserScreenView()),
       GoRoute(
-        path: '/invite',
-        builder: (context, state) => MemoryInviteScreen(),
+        path: '/invite/:memoryId',
+        name: 'invite',
+        builder: (context, state) {
+          final memoryId = state.pathParameters['memoryId']!;
+          return MemoryInviteScreen(memoryId: memoryId);
+        },
       ),
     ],
   );

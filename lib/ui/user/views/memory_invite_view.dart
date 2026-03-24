@@ -2,50 +2,72 @@ import 'package:flutter/material.dart';
 import 'package:memorise_mobile/ui/user/view_models/memory_invite_view_model.dart';
 import 'package:provider/provider.dart';
 
-class MemoryInviteScreen extends StatelessWidget {
-  const MemoryInviteScreen({super.key});
+class MemoryInviteScreen extends StatefulWidget {
+  final String memoryId;
+  const MemoryInviteScreen({super.key, required this.memoryId});
+
+  @override
+  State<MemoryInviteScreen> createState() => _MemoryInviteScreen();
+}
+
+class _MemoryInviteScreen extends State<MemoryInviteScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+
+    // The Secret Sauce: Listen for tab changes
+    _tabController.addListener(() {
+      if (_tabController.index == 1 && !_tabController.indexIsChanging) {
+        // Tab index 1 is "Social". Trigger the fetch!
+        context.read<MemoryInviteViewModel>().fetchInviteToken(widget.memoryId);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Add to Memory'),
-          // Keeps the transition smooth from the main app
-          surfaceTintColor: Colors.transparent,
-        ),
-        body: const TabBarView(
-          children: [_InternalAddTab(), _SocialShareTab()],
-        ),
-        // We use a Column to mimic the structure of a NavigationBar
-        bottomNavigationBar: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Divider(height: 1, thickness: 0.5), // Subtle M3 line
-            Container(
-              // Using surfaceContainer to match the NavigationBar background
-              color: colorScheme.surfaceContainer,
-              child: SafeArea(
-                child: TabBar(
-                  // Styling to match the M3 NavigationBar look
-                  indicatorColor: colorScheme.primary,
-                  indicatorWeight: 3,
-                  labelColor: colorScheme.primary,
-                  unselectedLabelColor: colorScheme.onSurfaceVariant,
-                  dividerColor:
-                      Colors.transparent, // Remove default bottom line
-                  tabs: const [
-                    Tab(icon: Icon(Icons.person_add_rounded), text: "Direct"),
-                    Tab(icon: Icon(Icons.share_rounded), text: "Social"),
-                  ],
-                ),
+    return Scaffold(
+      appBar: AppBar(title: const Text('Add to Memory')),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          const _InternalAddTab(),
+          _SocialShareTab(
+            token: context.watch<MemoryInviteViewModel>().inviteToken,
+          ),
+        ],
+      ),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Divider(height: 1),
+          Container(
+            color: colorScheme.surfaceContainer,
+            child: SafeArea(
+              child: TabBar(
+                controller: _tabController,
+                indicatorColor: colorScheme.primary,
+                labelColor: colorScheme.primary,
+                tabs: const [
+                  Tab(icon: Icon(Icons.person_add_outlined), text: "Direct"),
+                  Tab(icon: Icon(Icons.share_outlined), text: "Social"),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -71,10 +93,10 @@ class _InternalAddTab extends StatelessWidget {
             backgroundColor: WidgetStateProperty.all(
               Theme.of(context).colorScheme.surfaceContainerHighest,
             ),
-            onChanged: (value) => viewModel.searchUsers(value),
+            //onChanged: (value) => viewModel.searchUsers(value),
           ),
           const SizedBox(height: 24),
-          if (viewModel.isLoading)
+          if (viewModel.isTokenLoading)
             const LinearProgressIndicator() // Cleaner for M3 search
           else
             const Expanded(
@@ -87,37 +109,36 @@ class _InternalAddTab extends StatelessWidget {
 }
 
 class _SocialShareTab extends StatelessWidget {
-  const _SocialShareTab();
+  final String? token;
+  const _SocialShareTab({this.token});
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final isLoading = context.watch<MemoryInviteViewModel>().isTokenLoading;
 
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Using a Container with a tonal background for the icon
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: colorScheme.secondaryContainer,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.qr_code_2,
-              size: 48,
-              color: colorScheme.onSecondaryContainer,
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            "Share Memory Access",
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 8),
-          const Text("Generate a unique link or QR code."),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (isLoading)
+              const CircularProgressIndicator()
+            else if (token != null) ...[
+              const Icon(Icons.vpn_key_outlined, size: 48),
+              const SizedBox(height: 16),
+              const Text("Your Invite Token:"),
+              SelectableText(
+                token!,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ] else
+              const Text("Failed to load token."),
+          ],
+        ),
       ),
     );
   }

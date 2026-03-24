@@ -156,4 +156,14 @@ class ApiService {
       throw e.response?.data['message'] ?? "Failed to update picture count";
     }
   }
+
+  Future<String> getMemoryInviteToken(String memoryId) async {
+    try {
+      final response = await _dio.get('/invite/$memoryId');
+      final data = response.data as Map<String, dynamic>;
+      return data['inviteLink'] as String;
+    } on DioException catch (e) {
+      throw Exception('Failed to get memory invite: ${e.message}');
+    }
+  }
 }

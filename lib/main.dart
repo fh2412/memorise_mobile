@@ -95,7 +95,7 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (context) =>
-              MemoryInviteViewModel(context.read<UserRepository>()),
+              MemoryInviteViewModel(context.read<MemoryRepository>()),
         ),
       ],
       child: const MemoriseApp(),

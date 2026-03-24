@@ -5,9 +5,9 @@ import 'package:memorise_mobile/domain/models/responses.dart';
 import 'package:memorise_mobile/domain/models/user_model.dart';
 
 class MemoryRepository {
-  final ApiService _memoryService;
+  final ApiService _apiService;
 
-  MemoryRepository(this._memoryService);
+  MemoryRepository(this._apiService);
 
   Future<PaginatedMemoryResponse> fetchMemories({
     required String userId,
@@ -30,7 +30,7 @@ class MemoryRepository {
         break;
     }
 
-    return await _memoryService.getMemories(
+    return await _apiService.getMemories(
       userId,
       endpoint,
       page: page,
@@ -39,7 +39,7 @@ class MemoryRepository {
   }
 
   Future<Memory> fetchMemoryDetails({required String memoryId}) async {
-    return await _memoryService.getMemoryDetails(memoryId);
+    return await _apiService.getMemoryDetails(memoryId);
   }
 
   Future<List<MemoryAttendee>> fetchMemoryDetailsFriends({
@@ -48,7 +48,7 @@ class MemoryRepository {
   }) async {
     try {
       // Calling the API service method updated above
-      return await _memoryService.getMemoryDetailsFriends(userId, memoryId);
+      return await _apiService.getMemoryDetailsFriends(userId, memoryId);
     } catch (e) {
       // Re-throw or handle repository-specific logging here
       rethrow;
@@ -56,9 +56,11 @@ class MemoryRepository {
   }
 
   Future<MemoriseUser> fetchMemoryCreator({required String userId}) async {
-    final Map<String, dynamic> rawData = await _memoryService.getUserData(
-      userId,
-    );
+    final Map<String, dynamic> rawData = await _apiService.getUserData(userId);
     return MemoriseUser.fromJson(rawData);
+  }
+
+  Future<String> getInviteToken(String memoryId) async {
+    return await _apiService.getMemoryInviteToken(memoryId);
   }
 }
