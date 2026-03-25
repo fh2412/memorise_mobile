@@ -68,7 +68,7 @@ class MemoryRepository {
     return await _apiService.getMemoryInfoByToken(token);
   }
 
-  Future<void> joinMemory(String token) async {
-    await _apiService.joinMemory(token);
+  Future<void> joinMemory(String token, String userId) async {
+    await _apiService.joinMemory(token, userId);
   }
 }

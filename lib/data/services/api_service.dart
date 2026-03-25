@@ -166,4 +166,17 @@ class ApiService {
       throw Exception('Failed to get memory invite: ${e.message}');
     }
   }
+
+  Future<Map<String, dynamic>> getMemoryInfoByToken(String token) async {
+    try {
+      final response = await _dio.get('/invite/info/$token');
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw Exception('Invalid or expired invite link: $e');
+    }
+  }
+
+  Future<void> joinMemory(String token, String userId) async {
+    await _dio.post('/invite/join/$token', data: {'userId': userId});
+  }
 }

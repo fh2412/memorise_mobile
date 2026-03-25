@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:memorise_mobile/ui/memories/views/join_memory_view.dart';
 import 'package:memorise_mobile/ui/user/views/memory_invite_view.dart';
 import 'package:memorise_mobile/ui/user/views/user_screen_view.dart';
 import '../ui/auth/views/login_view.dart';
@@ -18,13 +19,24 @@ class AppRouter {
       final bool loggedIn = FirebaseAuth.instance.currentUser != null;
       final bool loggingIn = state.matchedLocation == '/login';
 
+      // 1. If not logged in, send them to login
       if (!loggedIn) {
-        return loggingIn ? null : '/login';
+        if (loggingIn) return null;
+
+        // Capture the location they were TRYING to hit (e.g., /join/xyz)
+        final fromLocation = state.matchedLocation;
+
+        // Redirect to login, but append the original destination as a query parameter
+        return '/login?from=$fromLocation';
       }
 
-      // If logged in but trying to go to login page, send to home
+      // 2. If logged in but sitting on the login page...
       if (loggingIn) {
-        return '/';
+        // Check if we have a "from" destination in the URL
+        final from = state.uri.queryParameters['from'];
+
+        // If "from" exists and isn't just the home page, go there. Otherwise, go home.
+        return (from != null && from != '/') ? from : '/';
       }
 
       return null;
@@ -39,6 +51,14 @@ class AppRouter {
         builder: (context, state) {
           final memoryId = state.pathParameters['memoryId']!;
           return MemoryInviteScreen(memoryId: memoryId);
+        },
+      ),
+      GoRoute(
+        path: '/join/:token',
+        name: 'join-memory',
+        builder: (context, state) {
+          final token = state.pathParameters['token']!;
+          return JoinMemoryScreen(token: token);
         },
       ),
     ],
