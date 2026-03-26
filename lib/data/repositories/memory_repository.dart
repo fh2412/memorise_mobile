@@ -71,4 +71,12 @@ class MemoryRepository {
   Future<void> joinMemory(String token, String userId) async {
     await _apiService.joinMemory(token, userId);
   }
+
+  Future<List<MemoryMissingFriend>> getMemoryMissingFriends(
+    String userId,
+    String memoryId,
+  ) async {
+    // Calling your API service
+    return await _apiService.getMemoryMissingFriends(userId, memoryId);
+  }
 }

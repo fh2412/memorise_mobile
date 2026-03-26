@@ -46,3 +46,36 @@ class MemoryAttendee {
             .toUpperCase()
       : "";
 }
+
+class MemoryMissingFriend {
+  final String userId;
+  final String name;
+  final String email;
+  final String? profilePic;
+
+  MemoryMissingFriend({
+    required this.userId,
+    required this.name,
+    required this.email,
+    this.profilePic,
+  });
+
+  // Factory constructor to create an instance from JSON
+  factory MemoryMissingFriend.fromJson(Map<String, dynamic> json) {
+    return MemoryMissingFriend(
+      userId: json['user_id'] as String,
+      name: json['name'] as String,
+      email: json['email'] as String,
+      profilePic: json['profilepic'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'user_id': userId,
+      'name': name,
+      'email': email,
+      'profilepic': profilePic,
+    };
+  }
+}

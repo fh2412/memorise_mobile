@@ -117,7 +117,6 @@ class ApiService {
   Future<Memory> getMemoryDetails(String memoryId) async {
     try {
       final response = await _dio.get('/memories/$memoryId');
-      print(response);
 
       return Memory.fromJson(response.data);
     } on DioException catch (e) {
@@ -178,5 +177,29 @@ class ApiService {
 
   Future<void> joinMemory(String token, String userId) async {
     await _dio.post('/invite/join/$token', data: {'userId': userId});
+  }
+
+  Future<List<MemoryMissingFriend>> getMemoryMissingFriends(
+    String userId,
+    String memoryId,
+  ) async {
+    try {
+      final response = await _dio.get(
+        '/friends/missingMemory/$memoryId/$userId/',
+      );
+      if (response.data is List) {
+        print("Memories missing Friends: $response");
+        return (response.data as List)
+            .map(
+              (item) =>
+                  MemoryMissingFriend.fromJson(item as Map<String, dynamic>),
+            )
+            .toList();
+      }
+
+      return [];
+    } on DioException catch (e) {
+      throw Exception('Failed to load memory missing friends: ${e.message}');
+    }
   }
 }
