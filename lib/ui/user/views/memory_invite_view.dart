@@ -164,8 +164,11 @@ class _InternalAddTabState extends State<_InternalAddTab> {
         // Sticky Save Button
         _SaveButton(
           count: vm.selectedUsers.length,
-          onPressed: () {
-            // Implementation for save
+          onPressed: () async {
+            await vm.addFriendsToMemory(widget.memoryId, vm.selectedUsers);
+
+            if (!context.mounted) return;
+            Navigator.of(context).pop();
           },
         ),
       ],
@@ -285,9 +288,12 @@ class _SocialShareTab extends StatelessWidget {
               FilledButton.icon(
                 onPressed: () {
                   // Use share_plus to open the native share sheet
-                  Share.share(
-                    'Hey! Join my shared memory on Memorise using this unique link: $fullInviteUrl',
-                    subject: 'Shared Memory Invitation',
+                  SharePlus.instance.share(
+                    ShareParams(
+                      text:
+                          'Hey! Join my shared memory on Memorise using this unique link: $fullInviteUrl',
+                      subject: 'Shared Memory Invitation',
+                    ),
                   );
                 },
                 icon: const Icon(Icons.send_rounded), // Rounded M3 send icon
@@ -412,7 +418,6 @@ class _SaveButton extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         boxShadow: [
-          // Subtle shadow to show it's "above" the bottom tabs
           BoxShadow(
             color: Colors.black.withValues(alpha: .05),
             blurRadius: 10,
@@ -427,19 +432,17 @@ class _SaveButton extends StatelessWidget {
           height: 56, // Standard M3 button height
           child: FilledButton(
             onPressed: (count > 0 && !isLoading) ? onPressed : null,
+
             style: FilledButton.styleFrom(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(24),
               ),
             ),
             child: isLoading
                 ? const SizedBox(
                     height: 24,
                     width: 24,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      color: Colors.white,
-                    ),
+                    child: CircularProgressIndicator(strokeWidth: 2.5),
                   )
                 : Text(
                     count == 0

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:memorise_mobile/data/repositories/memory_repository.dart';
+import 'package:memorise_mobile/data/services/snackbar_service.dart';
 import 'package:memorise_mobile/domain/models/friends_model.dart';
 
 class MemoryInviteViewModel extends ChangeNotifier {
@@ -86,6 +87,26 @@ class MemoryInviteViewModel extends ChangeNotifier {
       debugPrint("Error fetching token: $e");
     } finally {
       _isTokenLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> addFriendsToMemory(
+    String memoryId,
+    List<MemoryMissingFriend> friendsToAdd,
+  ) async {
+    _isLoading = true;
+    notifyListeners();
+    List<String> emails = friendsToAdd.map((friend) => friend.email).toList();
+    try {
+      await _memoryRepository.addFriendsToMemory(memoryId, emails);
+      SnackBarService.show('You have added new Friends to the Memory!');
+      return true;
+    } catch (e) {
+      SnackBarService.show('There was a Error adding your Friends');
+      return false;
+    } finally {
+      _isLoading = false;
       notifyListeners();
     }
   }

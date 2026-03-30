@@ -179,6 +179,13 @@ class ApiService {
     await _dio.post('/invite/join/$token', data: {'userId': userId});
   }
 
+  Future<void> addFriendsToMemory(String memoryId, List<String> emails) async {
+    await _dio.post(
+      '/memories/addFriendsToMemory',
+      data: {'emails': emails, 'memoryId': memoryId},
+    );
+  }
+
   Future<List<MemoryMissingFriend>> getMemoryMissingFriends(
     String userId,
     String memoryId,
@@ -188,7 +195,6 @@ class ApiService {
         '/friends/missingMemory/$memoryId/$userId/',
       );
       if (response.data is List) {
-        print("Memories missing Friends: $response");
         return (response.data as List)
             .map(
               (item) =>

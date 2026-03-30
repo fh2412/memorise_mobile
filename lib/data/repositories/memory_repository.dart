@@ -72,6 +72,10 @@ class MemoryRepository {
     await _apiService.joinMemory(token, userId);
   }
 
+  Future<void> addFriendsToMemory(String memoryId, List<String> emails) async {
+    await _apiService.addFriendsToMemory(memoryId, emails);
+  }
+
   Future<List<MemoryMissingFriend>> getMemoryMissingFriends(
     String userId,
     String memoryId,
