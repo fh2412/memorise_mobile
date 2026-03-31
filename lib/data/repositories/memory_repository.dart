@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:memorise_mobile/data/services/api_service.dart';
 import 'package:memorise_mobile/domain/models/friends_model.dart';
 import 'package:memorise_mobile/domain/models/memory_model.dart';
@@ -6,6 +8,9 @@ import 'package:memorise_mobile/domain/models/user_model.dart';
 
 class MemoryRepository {
   final ApiService _apiService;
+
+  final _memoryUpdateController = StreamController<String>.broadcast();
+  Stream<String> get onMemoryUpdated => _memoryUpdateController.stream;
 
   MemoryRepository(this._apiService);
 
@@ -74,6 +79,7 @@ class MemoryRepository {
 
   Future<void> addFriendsToMemory(String memoryId, List<String> emails) async {
     await _apiService.addFriendsToMemory(memoryId, emails);
+    _memoryUpdateController.add(memoryId);
   }
 
   Future<List<MemoryMissingFriend>> getMemoryMissingFriends(
@@ -82,5 +88,9 @@ class MemoryRepository {
   ) async {
     // Calling your API service
     return await _apiService.getMemoryMissingFriends(userId, memoryId);
+  }
+
+  void dispose() {
+    _memoryUpdateController.close();
   }
 }

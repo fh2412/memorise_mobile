@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:memorise_mobile/data/repositories/memory_repository.dart';
@@ -7,6 +9,10 @@ import 'package:memorise_mobile/domain/models/user_model.dart';
 
 class MemoryDetailViewModel extends ChangeNotifier {
   late final MemoryRepository _memoryRepository;
+
+  StreamSubscription<String>? _repositorySubscription;
+
+  String? _currentMemoryId;
 
   Memory? _selectedMemory;
   Memory? get selectedMemory => _selectedMemory;
@@ -25,9 +31,18 @@ class MemoryDetailViewModel extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  MemoryDetailViewModel(this._memoryRepository);
+  MemoryDetailViewModel(this._memoryRepository) {
+    _repositorySubscription = _memoryRepository.onMemoryUpdated.listen((
+      updatedId,
+    ) {
+      if (updatedId == _currentMemoryId) {
+        fetchMemoryDetails(updatedId);
+      }
+    });
+  }
 
   Future<void> fetchMemoryDetails(String memoryId) async {
+    _currentMemoryId = memoryId;
     _isLoading = true;
     _errorMessage = null;
     _selectedMemory = null;
@@ -57,5 +72,11 @@ class MemoryDetailViewModel extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  @override
+  void dispose() {
+    _repositorySubscription?.cancel();
+    super.dispose();
   }
 }

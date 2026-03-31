@@ -75,7 +75,6 @@ class MemoryInviteViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchInviteToken(String memoryId) async {
-    // Only fetch if we don't have one yet
     if (_inviteToken != null || _isTokenLoading) return;
 
     _isTokenLoading = true;
@@ -104,8 +103,10 @@ class MemoryInviteViewModel extends ChangeNotifier {
       return true;
     } catch (e) {
       SnackBarService.show('There was a Error adding your Friends');
+      print('There was a Error adding your Friends $e');
       return false;
     } finally {
+      _selectedUsers.clear();
       _isLoading = false;
       notifyListeners();
     }
