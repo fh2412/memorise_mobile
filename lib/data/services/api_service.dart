@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:memorise_mobile/domain/models/friends_model.dart';
+import 'package:memorise_mobile/domain/models/location_model.dart';
 import 'package:memorise_mobile/domain/models/memory_model.dart';
 import 'package:memorise_mobile/domain/models/responses.dart';
 
@@ -207,5 +208,34 @@ class ApiService {
     } on DioException catch (e) {
       throw Exception('Failed to load memory missing friends: ${e.message}');
     }
+  }
+
+  Future<void> createMemory(Memory memory) async {
+    await _dio.post(
+      '/memories/createMemory',
+      data: {
+        'creator_id': memory.userId,
+        'title': memory.title,
+        'description': memory.text,
+        'location_id': memory.locationId,
+        'memory_date': memory.memoryDate,
+        'memory_end_date': memory.memoryEndDate,
+        'title_pic': memory.titlePic,
+        'activity_id': memory.activityId,
+      },
+    );
+  }
+
+  Future<void> createLocation(MemoriseLocation location) async {
+    await _dio.post(
+      '/locations/createLocation',
+      data: {
+        'country': location.country,
+        'countryCode': location.countryCode,
+        'city': location.city,
+        'latitude': location.latitude,
+        'longitude': location.latitude,
+      },
+    );
   }
 }
