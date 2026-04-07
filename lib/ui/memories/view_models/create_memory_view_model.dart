@@ -4,6 +4,13 @@ import 'package:memorise_mobile/data/repositories/memory_repository.dart';
 class MemoryCreationViewModel extends ChangeNotifier {
   final MemoryRepository _repository;
 
+  final titleController = TextEditingController();
+  final descriptionController = TextEditingController();
+  bool isActive = true;
+  DateTime? startDate;
+  DateTime? endDate;
+  String? selectedLocationName;
+
   MemoryCreationViewModel(this._repository);
 
   int _currentStep = 0;
@@ -12,24 +19,21 @@ class MemoryCreationViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  // Draft Data
-  String title = '';
-  DateTime? startDate;
-  DateTime? endDate;
-  List<String> selectedFriends = [];
-  List<String> photoPaths = [];
+  bool get isMetadataValid {
+    return titleController.text.isNotEmpty && startDate != null;
+  }
 
   void setStep(int step) {
     _currentStep = step;
     notifyListeners();
   }
 
-  void nextStep() {
-    if (_currentStep < 2) {
+  void nextStep(int totalSteps) {
+    if (_currentStep < totalSteps - 1) {
       _currentStep++;
       notifyListeners();
     } else {
-      submitMemory();
+      _submitMemory();
     }
   }
 
@@ -40,16 +44,44 @@ class MemoryCreationViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> submitMemory() async {
+  Future<void> _submitMemory() async {
     _isLoading = true;
     notifyListeners();
+    // API call logic...
+    _isLoading = false;
+    notifyListeners();
+  }
 
-    try {
-      // Logic to construct your Memory and Location objects from draft data
-      // await _repository.saveMemory(memory: ..., location: ...);
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
+  // --- Form Methods ---
+  void updateIsActive(bool? value) {
+    isActive = value ?? true;
+    notifyListeners();
+  }
+
+  void updateStartDate(DateTime date) {
+    startDate = date;
+    notifyListeners();
+  }
+
+  void updateEndDate(DateTime date) {
+    endDate = date;
+    notifyListeners();
+  }
+
+  void setLocation(String name) {
+    selectedLocationName = name;
+    notifyListeners();
+  }
+
+  Future<void> fetchCurrentLocation() async {
+    // Logic for GPS will go here
+    setLocation("Current GPS Location");
+  }
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    descriptionController.dispose();
+    super.dispose();
   }
 }
