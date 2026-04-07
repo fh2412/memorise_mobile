@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:memorise_mobile/ui/memories/views/create_memory_view.dart';
 import 'package:memorise_mobile/ui/memories/views/join_memory_view.dart';
 import 'package:memorise_mobile/ui/user/views/memory_invite_view.dart';
 import 'package:memorise_mobile/ui/user/views/user_screen_view.dart';
@@ -45,6 +46,10 @@ class AppRouter {
       GoRoute(path: '/', builder: (context, state) => HomeView()),
       GoRoute(path: '/login', builder: (context, state) => LoginView()),
       GoRoute(path: '/user', builder: (context, state) => UserScreenView()),
+      GoRoute(
+        path: '/memory/create',
+        builder: (context, state) => CreateMemoryScreen(),
+      ),
       GoRoute(
         path: '/invite/:memoryId',
         name: 'invite',

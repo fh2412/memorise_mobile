@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:memorise_mobile/domain/models/memory_model.dart';
 import 'package:memorise_mobile/ui/core/view/special_create_button_view.dart';
 import 'package:memorise_mobile/ui/home/view_models/my_memories_screen_view_model.dart';
@@ -40,7 +41,7 @@ class _MyMemoriesViewState extends State<MyMemoriesView> {
   }
 
   void _handleCreateNew() {
-    // TODO: Navigate to creation flow
+    context.push('/memory/create');
   }
 
   @override

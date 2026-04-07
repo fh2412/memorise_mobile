@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:memorise_mobile/data/services/api_service.dart';
 import 'package:memorise_mobile/domain/models/friends_model.dart';
+import 'package:memorise_mobile/domain/models/location_model.dart';
 import 'package:memorise_mobile/domain/models/memory_model.dart';
 import 'package:memorise_mobile/domain/models/responses.dart';
 import 'package:memorise_mobile/domain/models/user_model.dart';
@@ -88,6 +89,23 @@ class MemoryRepository {
   ) async {
     // Calling your API service
     return await _apiService.getMemoryMissingFriends(userId, memoryId);
+  }
+
+  Future<void> saveMemory({
+    required Memory memory,
+    required MemoriseLocation location,
+  }) async {
+    try {
+      // 1. Create the location first
+      await _apiService.createLocation(location);
+
+      // 2. Create the memory
+      // Note: In a real scenario, you'd likely get a locationId back
+      // from the createLocation call to pass into the memory object.
+      await _apiService.createMemory(memory);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   void dispose() {
