@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:memorise_mobile/data/repositories/memory_repository.dart';
+import 'package:memorise_mobile/data/services/snackbar_service.dart';
 
 class MemoryCreationViewModel extends ChangeNotifier {
   final MemoryRepository _repository;
 
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
   bool isActive = true;
@@ -28,10 +30,17 @@ class MemoryCreationViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void nextStep(int totalSteps) {
-    if (_currentStep < totalSteps - 1) {
-      _currentStep++;
-      notifyListeners();
+  void nextStep() {
+    if (_currentStep == 0 && !isMetadataValid) {
+      formKey.currentState?.validate();
+      SnackBarService.show(
+        'Give your Memory a Title and Date!',
+        isError: false,
+      );
+      return;
+    }
+    if (_currentStep < 2) {
+      setStep(_currentStep + 1);
     } else {
       _submitMemory();
     }

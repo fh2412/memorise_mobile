@@ -29,7 +29,7 @@ class _CreateMemoryScreenState extends State<CreateMemoryScreen> {
           type: StepperType.horizontal,
           elevation: 0, // Keeps it flat and clean for M3
           currentStep: vm.currentStep,
-          onStepContinue: () => vm.nextStep(3),
+          onStepContinue: () => vm.nextStep(),
           onStepCancel: vm.previousStep,
           // Customizing controls to use M3 buttons
           controlsBuilder: (context, details) {
