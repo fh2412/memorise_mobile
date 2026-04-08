@@ -91,19 +91,20 @@ class MemoryRepository {
     return await _apiService.getMemoryMissingFriends(userId, memoryId);
   }
 
-  Future<void> saveMemory({
-    required Memory memory,
+  Future<int> saveMemory({
+    required CreateMemory memory,
     required MemoriseLocation location,
   }) async {
     try {
       // 1. Create the location first
-      await _apiService.createLocation(location);
+      //await _apiService.createLocation(location);
 
       // 2. Create the memory
       // Note: In a real scenario, you'd likely get a locationId back
       // from the createLocation call to pass into the memory object.
-      await _apiService.createMemory(memory);
+      return await _apiService.createMemory(memory);
     } catch (e) {
+      print('ERROR $e');
       rethrow;
     }
   }

@@ -61,3 +61,25 @@ class Memory {
 }
 
 enum MemoryFilter { all, created, added }
+
+class CreateMemory {
+  final String userId;
+  final String title;
+  final String text;
+  final int locationId;
+  final DateTime memoryDate;
+  final DateTime? memoryEndDate;
+  final String? titlePic;
+  final int activityId;
+
+  CreateMemory({
+    required this.userId,
+    required this.title,
+    required this.text,
+    required this.locationId,
+    required this.memoryDate,
+    this.memoryEndDate,
+    this.titlePic,
+    required this.activityId,
+  });
+}

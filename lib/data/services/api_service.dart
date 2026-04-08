@@ -210,24 +210,27 @@ class ApiService {
     }
   }
 
-  Future<void> createMemory(Memory memory) async {
-    await _dio.post(
+  Future<int> createMemory(CreateMemory memory) async {
+    final response = await _dio.post(
       '/memories/createMemory',
       data: {
         'creator_id': memory.userId,
         'title': memory.title,
         'description': memory.text,
         'location_id': memory.locationId,
-        'memory_date': memory.memoryDate,
-        'memory_end_date': memory.memoryEndDate,
+        'memory_date': memory.memoryDate.toIso8601String(),
+        'memory_end_date': memory.memoryEndDate?.toIso8601String(),
         'title_pic': memory.titlePic,
         'activity_id': memory.activityId,
       },
     );
+    final data = response.data as Map<String, dynamic>;
+    print(data);
+    return data['memory_id'] as int;
   }
 
   Future<void> createLocation(MemoriseLocation location) async {
-    await _dio.post(
+    final locationId = await _dio.post(
       '/locations/createLocation',
       data: {
         'country': location.country,
@@ -237,5 +240,6 @@ class ApiService {
         'longitude': location.latitude,
       },
     );
+    return locationId.data;
   }
 }

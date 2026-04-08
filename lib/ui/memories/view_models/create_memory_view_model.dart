@@ -1,6 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:memorise_mobile/data/repositories/memory_repository.dart';
 import 'package:memorise_mobile/data/services/snackbar_service.dart';
+import 'package:memorise_mobile/domain/models/location_model.dart';
+import 'package:memorise_mobile/domain/models/memory_model.dart';
 
 class MemoryCreationViewModel extends ChangeNotifier {
   final MemoryRepository _repository;
@@ -14,6 +17,8 @@ class MemoryCreationViewModel extends ChangeNotifier {
   String? selectedLocationName;
 
   MemoryCreationViewModel(this._repository);
+
+  int? memoryId;
 
   int _currentStep = 0;
   int get currentStep => _currentStep;
@@ -30,7 +35,7 @@ class MemoryCreationViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void nextStep() {
+  Future<void> nextStep() async {
     if (_currentStep == 0 && !isMetadataValid) {
       formKey.currentState?.validate();
       SnackBarService.show(
@@ -40,9 +45,19 @@ class MemoryCreationViewModel extends ChangeNotifier {
       return;
     }
     if (_currentStep < 2) {
-      setStep(_currentStep + 1);
+      if (_currentStep == 0 && memoryId == null) {
+        memoryId = await createBasicMemory();
+        print("new memoryId is: $memoryId");
+        _isLoading = false;
+        notifyListeners();
+        setStep(_currentStep + 1);
+      } else {
+        print("UPDATE MEMORY HERE");
+      }
     } else {
-      _submitMemory();
+      memoryId = await createBasicMemory();
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -53,12 +68,28 @@ class MemoryCreationViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> _submitMemory() async {
+  Future<int> createBasicMemory() async {
+    print('Creating Memory');
     _isLoading = true;
     notifyListeners();
-    // API call logic...
-    _isLoading = false;
-    notifyListeners();
+    final memory = CreateMemory(
+      userId: FirebaseAuth.instance.currentUser!.uid,
+      title: titleController.text,
+      text: descriptionController.text,
+      locationId: 1, //PLACEHOLDER
+      memoryDate: startDate!,
+      memoryEndDate: endDate ?? startDate,
+      titlePic: '',
+      activityId: 1,
+    );
+    final location = MemoriseLocation(
+      latitude: 0.0,
+      longitude: 0.0,
+      country: '',
+      countryCode: '',
+      locationId: 1,
+    );
+    return _repository.saveMemory(memory: memory, location: location);
   }
 
   // --- Form Methods ---
