@@ -30,6 +30,24 @@ class MemoryCreationViewModel extends ChangeNotifier {
     return titleController.text.isNotEmpty && startDate != null;
   }
 
+  void handleBackAction() {
+    if (memoryId != null) {
+      _repository.deleteMemory(memoryId.toString());
+      print('Memory DELETED: $memoryId');
+    }
+    clearForm();
+  }
+
+  void clearForm() {
+    titleController.clear();
+    descriptionController.clear();
+    startDate = null;
+    endDate = null;
+    // Clear any selected friends/photos too
+    _currentStep = 0;
+    notifyListeners();
+  }
+
   void setStep(int step) {
     _currentStep = step;
     notifyListeners();

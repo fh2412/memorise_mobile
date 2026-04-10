@@ -242,4 +242,8 @@ class ApiService {
     );
     return locationId.data;
   }
+
+  Future<void> deleteMemory(String memoryId) async {
+    await _dio.delete('/memories/$memoryId');
+  }
 }

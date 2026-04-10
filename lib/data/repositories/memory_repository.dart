@@ -109,6 +109,10 @@ class MemoryRepository {
     }
   }
 
+  Future<void> deleteMemory(String memoryId) {
+    return _apiService.deleteMemory(memoryId);
+  }
+
   void dispose() {
     _memoryUpdateController.close();
   }

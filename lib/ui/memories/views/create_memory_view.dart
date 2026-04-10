@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memorise_mobile/ui/memories/view_models/create_memory_view_model.dart';
+import 'package:memorise_mobile/ui/user/views/friends_selection_view.dart';
 import 'package:provider/provider.dart';
 
 class CreateMemoryScreen extends StatefulWidget {
@@ -16,79 +17,90 @@ class _CreateMemoryScreenState extends State<CreateMemoryScreen> {
     final vm = context.watch<MemoryCreationViewModel>();
     final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(title: const Text("New Memory"), centerTitle: true),
-      body: Theme(
-        // Overriding the Stepper theme locally to ensure M3 consistency
-        data: theme.copyWith(
-          colorScheme: theme.colorScheme.copyWith(
-            primary: theme.colorScheme.primary,
+    return PopScope(
+      canPop: false, // We handle the pop manually after the dialog
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+
+        // Trigger the confirmation dialog
+        final shouldDiscard = await _showDiscardDialog(context);
+
+        if (shouldDiscard && context.mounted) {
+          vm.handleBackAction(); // Wipe the data
+          Navigator.of(context).pop(); // Actually leave the screen
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(title: const Text("New Memory"), centerTitle: true),
+        body: Theme(
+          // Overriding the Stepper theme locally to ensure M3 consistency
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: theme.colorScheme.primary,
+            ),
           ),
-        ),
-        child: Stepper(
-          type: StepperType.horizontal,
-          elevation: 0, // Keeps it flat and clean for M3
-          currentStep: vm.currentStep,
-          onStepContinue: () => vm.nextStep(),
-          onStepCancel: vm.previousStep,
-          // Customizing controls to use M3 buttons
-          controlsBuilder: (context, details) {
-            return Padding(
-              padding: const EdgeInsets.only(top: 32.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: FilledButton(
-                      onPressed: details.onStepContinue,
-                      child: Text(vm.currentStep == 2 ? 'Create' : 'Next'),
+          child: Stepper(
+            type: StepperType.horizontal,
+            elevation: 0, // Keeps it flat and clean for M3
+            currentStep: vm.currentStep,
+            onStepContinue: () => vm.nextStep(),
+            onStepCancel: vm.previousStep,
+            // Customizing controls to use M3 buttons
+            controlsBuilder: (context, details) {
+              return Padding(
+                padding: const EdgeInsets.only(top: 32.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: FilledButton(
+                        onPressed: details.onStepContinue,
+                        child: Text(vm.currentStep == 2 ? 'Create' : 'Next'),
+                      ),
                     ),
-                  ),
-                  if (vm.currentStep > 0) ...[
-                    const SizedBox(width: 12),
-                    TextButton(
-                      onPressed: details.onStepCancel,
-                      child: const Text('Back'),
-                    ),
+                    if (vm.currentStep > 0) ...[
+                      const SizedBox(width: 12),
+                      TextButton(
+                        onPressed: details.onStepCancel,
+                        child: const Text('Back'),
+                      ),
+                    ],
                   ],
-                ],
+                ),
+              );
+            },
+            steps: [
+              Step(
+                state: vm.currentStep > 0
+                    ? StepState.complete
+                    : StepState.indexed,
+                isActive: vm.currentStep >= 0,
+                title: const Text("Details"),
+                content: MetadataStep(),
               ),
-            );
-          },
-          steps: [
-            Step(
-              state: vm.currentStep > 0
-                  ? StepState.complete
-                  : StepState.indexed,
-              isActive: vm.currentStep >= 0,
-              title: const Text("Details"),
-              content: MetadataStep(),
-            ),
-            Step(
-              state: vm.currentStep > 1
-                  ? StepState.complete
-                  : StepState.indexed,
-              isActive: vm.currentStep >= 1,
-              title: const Text("Friends"),
-              content: const Card(
-                child: SizedBox(
-                  height: 200,
-                  width: double.infinity,
-                  child: Center(child: Text("Friends List")),
+              Step(
+                state: vm.currentStep > 1
+                    ? StepState.complete
+                    : StepState.indexed,
+                isActive: vm.currentStep >= 1,
+                title: const Text("Friends"),
+                content: SizedBox(
+                  height: 500, // Give it a specific "box" to live in
+                  child: FriendsSelectionStep(memoryId: vm.memoryId.toString()),
                 ),
               ),
-            ),
-            Step(
-              isActive: vm.currentStep >= 2,
-              title: const Text("Photos"),
-              content: const Card(
-                child: SizedBox(
-                  height: 200,
-                  width: double.infinity,
-                  child: Center(child: Text("Photo Grid")),
+              Step(
+                isActive: vm.currentStep >= 2,
+                title: const Text("Photos"),
+                content: const Card(
+                  child: SizedBox(
+                    height: 200,
+                    width: double.infinity,
+                    child: Center(child: Text("Photo Grid")),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -251,4 +263,30 @@ class _DatePickerField extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<bool> _showDiscardDialog(BuildContext context) async {
+  return await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Discard Memory?"),
+          content: const Text(
+            "Are you sure you want to cancel? All your current progress will be lost.",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false), // Stay here
+              child: const Text("Continue Editing"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true), // Exit
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.error,
+              ),
+              child: const Text("Discard"),
+            ),
+          ],
+        ),
+      ) ??
+      false; // Default to false if they click outside the dialog
 }
