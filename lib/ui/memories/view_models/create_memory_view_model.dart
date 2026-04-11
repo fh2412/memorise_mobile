@@ -33,7 +33,6 @@ class MemoryCreationViewModel extends ChangeNotifier {
   void handleBackAction() {
     if (memoryId != null) {
       _repository.deleteMemory(memoryId.toString());
-      print('Memory DELETED: $memoryId');
     }
     clearForm();
   }
@@ -43,6 +42,7 @@ class MemoryCreationViewModel extends ChangeNotifier {
     descriptionController.clear();
     startDate = null;
     endDate = null;
+    memoryId = null;
     // Clear any selected friends/photos too
     _currentStep = 0;
     notifyListeners();
@@ -54,26 +54,29 @@ class MemoryCreationViewModel extends ChangeNotifier {
   }
 
   Future<void> nextStep() async {
-    if (_currentStep == 0 && !isMetadataValid) {
-      formKey.currentState?.validate();
-      SnackBarService.show(
-        'Give your Memory a Title and Date!',
-        isError: false,
-      );
-      return;
-    }
-    if (_currentStep < 2) {
-      if (_currentStep == 0 && memoryId == null) {
+    if (_currentStep == 0) {
+      if (!isMetadataValid) {
+        formKey.currentState?.validate();
+        SnackBarService.show(
+          'Give your Memory a Title and Date!',
+          isError: false,
+        );
+        return;
+      } else if (memoryId == null) {
         memoryId = await createBasicMemory();
         print("new memoryId is: $memoryId");
         _isLoading = false;
         notifyListeners();
         setStep(_currentStep + 1);
       } else {
-        print("UPDATE MEMORY HERE");
+        updateMemory();
+        setStep(_currentStep + 1);
       }
+    } else if (_currentStep == 1) {
+      setStep(_currentStep + 1);
     } else {
-      memoryId = await createBasicMemory();
+      // Upload Images and add Friends
+      // Clear both as well
       _isLoading = false;
       notifyListeners();
     }
@@ -107,7 +110,32 @@ class MemoryCreationViewModel extends ChangeNotifier {
       countryCode: '',
       locationId: 1,
     );
-    return _repository.saveMemory(memory: memory, location: location);
+    return _repository.saveMemory(
+      memory: memory,
+      location: location,
+      isNew: true,
+    );
+  }
+
+  Future<int> updateMemory() async {
+    print('Updating Memory');
+    _isLoading = true;
+    notifyListeners();
+    final memory = CreateMemory(
+      userId: FirebaseAuth.instance.currentUser!.uid,
+      title: titleController.text,
+      text: descriptionController.text,
+      locationId: 1, //PLACEHOLDER
+      memoryDate: startDate!,
+      memoryEndDate: endDate ?? startDate,
+      titlePic: '',
+      activityId: 1,
+    );
+    return _repository.saveMemory(
+      memory: memory,
+      isNew: false,
+      memoryId: memoryId,
+    );
   }
 
   // --- Form Methods ---

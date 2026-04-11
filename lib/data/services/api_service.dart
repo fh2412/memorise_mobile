@@ -229,6 +229,18 @@ class ApiService {
     return data['memory_id'] as int;
   }
 
+  Future<void> updateMemory(CreateMemory memory, String memoryId) async {
+    await _dio.put(
+      '/memories/$memoryId',
+      data: {
+        'title': memory.title,
+        'description': memory.text,
+        'memory_date': memory.memoryDate.toIso8601String(),
+        'memory_end_date': memory.memoryEndDate?.toIso8601String(),
+      },
+    );
+  }
+
   Future<void> createLocation(MemoriseLocation location) async {
     final locationId = await _dio.post(
       '/locations/createLocation',

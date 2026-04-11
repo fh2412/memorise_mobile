@@ -93,7 +93,9 @@ class MemoryRepository {
 
   Future<int> saveMemory({
     required CreateMemory memory,
-    required MemoriseLocation location,
+    MemoriseLocation? location,
+    required bool isNew,
+    int? memoryId,
   }) async {
     try {
       // 1. Create the location first
@@ -102,7 +104,12 @@ class MemoryRepository {
       // 2. Create the memory
       // Note: In a real scenario, you'd likely get a locationId back
       // from the createLocation call to pass into the memory object.
-      return await _apiService.createMemory(memory);
+      if (isNew) {
+        return await _apiService.createMemory(memory);
+      } else if (memoryId != null) {
+        await _apiService.updateMemory(memory, memoryId.toString());
+      }
+      return memoryId ?? 0;
     } catch (e) {
       print('ERROR $e');
       rethrow;
