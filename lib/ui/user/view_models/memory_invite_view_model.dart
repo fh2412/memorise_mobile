@@ -6,15 +6,17 @@ import 'package:memorise_mobile/domain/models/friends_model.dart';
 
 class MemoryInviteViewModel extends ChangeNotifier {
   final MemoryRepository _memoryRepository;
-  MemoryInviteViewModel(this._memoryRepository);
+  MemoryInviteViewModel(this._memoryRepository) {
+    _memoryRepository.selectedUsersNotifier.addListener(notifyListeners);
+  }
 
   List<MemoryMissingFriend> _allPotentialFriends = [];
 
   List<MemoryMissingFriend> _filteredFriends = [];
   List<MemoryMissingFriend> get filteredFriends => _filteredFriends;
 
-  final List<MemoryMissingFriend> _selectedUsers = [];
-  List<MemoryMissingFriend> get selectedUsers => _selectedUsers;
+  List<MemoryMissingFriend> get selectedUsers =>
+      _memoryRepository.selectedUsers;
 
   String? _inviteToken;
   String? get inviteToken => _inviteToken;
@@ -66,11 +68,7 @@ class MemoryInviteViewModel extends ChangeNotifier {
   }
 
   void toggleUserSelection(MemoryMissingFriend user) {
-    if (_selectedUsers.any((u) => u.userId == user.userId)) {
-      _selectedUsers.removeWhere((u) => u.userId == user.userId);
-    } else {
-      _selectedUsers.add(user);
-    }
+    _memoryRepository.toggleUserSelection(user);
     notifyListeners();
   }
 
@@ -106,9 +104,15 @@ class MemoryInviteViewModel extends ChangeNotifier {
       print('There was a Error adding your Friends $e');
       return false;
     } finally {
-      _selectedUsers.clear();
+      _memoryRepository.clearSelectedUsers();
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  @override
+  void dispose() {
+    _memoryRepository.selectedUsersNotifier.removeListener(notifyListeners);
+    super.dispose();
   }
 }

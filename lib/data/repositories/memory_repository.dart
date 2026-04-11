@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:memorise_mobile/data/services/api_service.dart';
 import 'package:memorise_mobile/domain/models/friends_model.dart';
 import 'package:memorise_mobile/domain/models/location_model.dart';
@@ -9,6 +10,11 @@ import 'package:memorise_mobile/domain/models/user_model.dart';
 
 class MemoryRepository {
   final ApiService _apiService;
+
+  final ValueNotifier<List<MemoryMissingFriend>> selectedUsersNotifier =
+      ValueNotifier<List<MemoryMissingFriend>>([]);
+
+  List<MemoryMissingFriend> get selectedUsers => selectedUsersNotifier.value;
 
   final _memoryUpdateController = StreamController<String>.broadcast();
   Stream<String> get onMemoryUpdated => _memoryUpdateController.stream;
@@ -118,6 +124,25 @@ class MemoryRepository {
 
   Future<void> deleteMemory(String memoryId) {
     return _apiService.deleteMemory(memoryId);
+  }
+
+  void toggleUserSelection(MemoryMissingFriend user) {
+    final currentList = List<MemoryMissingFriend>.from(
+      selectedUsersNotifier.value,
+    );
+
+    if (currentList.any((u) => u.userId == user.userId)) {
+      currentList.removeWhere((u) => u.userId == user.userId);
+    } else {
+      currentList.add(user);
+    }
+
+    // Assigning a new list triggers the listeners
+    selectedUsersNotifier.value = currentList;
+  }
+
+  void clearSelectedUsers() {
+    selectedUsersNotifier.value = [];
   }
 
   void dispose() {

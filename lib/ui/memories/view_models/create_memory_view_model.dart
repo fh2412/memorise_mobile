@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:memorise_mobile/data/repositories/memory_repository.dart';
 import 'package:memorise_mobile/data/services/snackbar_service.dart';
+import 'package:memorise_mobile/domain/models/friends_model.dart';
 import 'package:memorise_mobile/domain/models/location_model.dart';
 import 'package:memorise_mobile/domain/models/memory_model.dart';
 
@@ -15,6 +16,8 @@ class MemoryCreationViewModel extends ChangeNotifier {
   DateTime? startDate;
   DateTime? endDate;
   String? selectedLocationName;
+
+  List<MemoryMissingFriend> get selectedUsers => _repository.selectedUsers;
 
   MemoryCreationViewModel(this._repository);
 
@@ -74,9 +77,12 @@ class MemoryCreationViewModel extends ChangeNotifier {
       }
     } else if (_currentStep == 1) {
       setStep(_currentStep + 1);
-    } else {
+    } else if (_currentStep == 2) {
+      print('creating memory!');
       // Upload Images and add Friends
+      addFriendsToMemory(memoryId.toString(), selectedUsers);
       // Clear both as well
+      _repository.clearSelectedUsers();
       _isLoading = false;
       notifyListeners();
     }
@@ -136,6 +142,28 @@ class MemoryCreationViewModel extends ChangeNotifier {
       isNew: false,
       memoryId: memoryId,
     );
+  }
+
+  Future<bool> addFriendsToMemory(
+    String memoryId,
+    List<MemoryMissingFriend> friendsToAdd,
+  ) async {
+    _isLoading = true;
+    notifyListeners();
+    List<String> emails = friendsToAdd.map((friend) => friend.email).toList();
+    try {
+      await _repository.addFriendsToMemory(memoryId, emails);
+      SnackBarService.show('You have added new Friends to the Memory!');
+      return true;
+    } catch (e) {
+      SnackBarService.show('There was a Error adding your Friends');
+      print('There was a Error adding your Friends $e');
+      return false;
+    } finally {
+      _repository.clearSelectedUsers();
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   // --- Form Methods ---
