@@ -31,6 +31,10 @@ class UploadViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void clearPhotos() {
+    _repository.clearPhotos();
+  }
+
   Future<void> executeUpload(int memoryId) async {
     _isUploading = true;
     notifyListeners();

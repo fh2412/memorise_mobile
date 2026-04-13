@@ -23,7 +23,16 @@ class _UploadViewState extends State<UploadView> {
 
     return Scaffold(
       // Material 3 AppBars are usually transparent/flat by default
-      appBar: AppBar(title: const Text("Add Photos")),
+      appBar: AppBar(
+        title: const Text("Add Photos"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            vm.clearPhotos();
+            Navigator.of(context).pop();
+          },
+        ),
+      ),
       body: Column(
         children: [
           Expanded(
