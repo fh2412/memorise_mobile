@@ -44,27 +44,52 @@ class _CreateMemoryScreenState extends State<CreateMemoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Assuming ViewModel is provided higher up the tree
     final vm = context.watch<MemoryCreationViewModel>();
     final theme = Theme.of(context);
 
     return PopScope(
-      canPop: false, // We handle the pop manually after the dialog
+      canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
-
-        // Trigger the confirmation dialog
         final shouldDiscard = await _showDiscardDialog(context);
-
         if (shouldDiscard && context.mounted) {
-          vm.handleBackAction(); // Wipe the data
-          Navigator.of(context).pop(); // Actually leave the screen
+          vm.handleBackAction();
+          Navigator.of(context).pop();
         }
       },
       child: Scaffold(
         appBar: AppBar(title: const Text("New Memory"), centerTitle: true),
+        // --- THE TRICK ---
+        // We use the bottomNavigationBar to keep buttons pinned at the bottom
+        bottomNavigationBar: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                if (vm.currentStep > 0) ...[
+                  TextButton(
+                    onPressed: vm.previousStep,
+                    child: const Text('Back'),
+                  ),
+                  const SizedBox(width: 12),
+                ],
+                Expanded(
+                  child: FilledButton(
+                    onPressed: () {
+                      if (vm.currentStep == 2) {
+                        _handleFinish(vm);
+                      } else {
+                        vm.nextStep();
+                      }
+                    },
+                    child: Text(vm.currentStep == 2 ? 'Create' : 'Next'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
         body: Theme(
-          // Overriding the Stepper theme locally to ensure M3 consistency
           data: theme.copyWith(
             colorScheme: theme.colorScheme.copyWith(
               primary: theme.colorScheme.primary,
@@ -72,39 +97,10 @@ class _CreateMemoryScreenState extends State<CreateMemoryScreen> {
           ),
           child: Stepper(
             type: StepperType.horizontal,
-            elevation: 0, // Keeps it flat and clean for M3
+            elevation: 0,
             currentStep: vm.currentStep,
-            onStepContinue: () {
-              if (vm.currentStep == 2) {
-                _handleFinish(vm);
-              } else {
-                vm.nextStep();
-              }
-            },
-            onStepCancel: vm.previousStep,
-            // Customizing controls to use M3 buttons
-            controlsBuilder: (context, details) {
-              return Padding(
-                padding: const EdgeInsets.only(top: 32.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: FilledButton(
-                        onPressed: details.onStepContinue,
-                        child: Text(vm.currentStep == 2 ? 'Create' : 'Next'),
-                      ),
-                    ),
-                    if (vm.currentStep > 0) ...[
-                      const SizedBox(width: 12),
-                      TextButton(
-                        onPressed: details.onStepCancel,
-                        child: const Text('Back'),
-                      ),
-                    ],
-                  ],
-                ),
-              );
-            },
+            // 1. Hide the default controls entirely
+            controlsBuilder: (context, details) => const SizedBox.shrink(),
             steps: [
               Step(
                 state: vm.currentStep > 0
@@ -112,7 +108,7 @@ class _CreateMemoryScreenState extends State<CreateMemoryScreen> {
                     : StepState.indexed,
                 isActive: vm.currentStep >= 0,
                 title: const Text("Details"),
-                content: MetadataStep(),
+                content: const MetadataStep(),
               ),
               Step(
                 state: vm.currentStep > 1
@@ -121,7 +117,8 @@ class _CreateMemoryScreenState extends State<CreateMemoryScreen> {
                 isActive: vm.currentStep >= 1,
                 title: const Text("Friends"),
                 content: SizedBox(
-                  height: 500,
+                  // Remove hardcoded height or use constrained box for better responsiveness
+                  height: MediaQuery.of(context).size.height * 0.5,
                   child: FriendsSelectionStep(memoryId: vm.memoryId.toString()),
                 ),
               ),
