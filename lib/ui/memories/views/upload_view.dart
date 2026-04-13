@@ -194,7 +194,7 @@ class _UploadViewState extends State<UploadView> {
                   ? null
                   : () async {
                       try {
-                        await vm.submitMemories(widget.memoryId);
+                        await vm.executeUpload(widget.memoryId);
                         if (!mounted) return;
 
                         Navigator.of(context).pop();

@@ -1,4 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:memorise_mobile/data/repositories/photo_repository.dart';
 import 'package:image_picker/image_picker.dart';
@@ -7,50 +8,49 @@ import 'package:memorise_mobile/data/services/snackbar_service.dart';
 class UploadViewModel extends ChangeNotifier {
   final PhotoRepository _repository;
 
-  UploadViewModel(this._repository);
+  UploadViewModel(this._repository) {
+    _repository.selectedPhotosNotifier.addListener(notifyListeners);
+  }
   final ImagePicker _picker = ImagePicker();
 
-  final List<XFile> _selectedPhotos = [];
-  bool _isUploading = false;
+  List<XFile> get selectedPhotos => _repository.selectedPhotos;
 
-  List<XFile> get selectedPhotos => _selectedPhotos;
+  bool _isUploading = false;
   bool get isUploading => _isUploading;
 
   Future<void> pickImages() async {
     final List<XFile> pickedFiles = await _picker.pickMultiImage();
     if (pickedFiles.isNotEmpty) {
-      _selectedPhotos.addAll(pickedFiles);
+      _repository.addPhotos(pickedFiles);
       notifyListeners();
     }
   }
 
   void removeImage(int index) {
-    _selectedPhotos.removeAt(index);
+    _repository.removePhoto(index);
     notifyListeners();
   }
 
-  Future<void> submitMemories(int memoryId) async {
-    if (_selectedPhotos.isEmpty) return;
-
+  Future<void> executeUpload(int memoryId) async {
     _isUploading = true;
     notifyListeners();
 
-    final userId = FirebaseAuth.instance.currentUser?.uid;
-
     try {
-      await _repository.uploadAndSync(
-        memoryId: memoryId.toString(),
-        files: _selectedPhotos,
-        userId: userId!,
-      );
-      _selectedPhotos.clear();
+      await _repository.uploadMemoryPhotos(memoryId: memoryId.toString());
+
+      _repository.clearPhotos();
       SnackBarService.show("Memories uploaded successfully!");
     } catch (e) {
       SnackBarService.show("Upload failed: $e", isError: true);
-      rethrow;
     } finally {
       _isUploading = false;
       notifyListeners();
     }
+  }
+
+  @override
+  void dispose() {
+    _repository.selectedPhotosNotifier.removeListener(notifyListeners);
+    super.dispose();
   }
 }

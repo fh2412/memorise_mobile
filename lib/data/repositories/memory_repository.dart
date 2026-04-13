@@ -137,7 +137,6 @@ class MemoryRepository {
       currentList.add(user);
     }
 
-    // Assigning a new list triggers the listeners
     selectedUsersNotifier.value = currentList;
   }
 

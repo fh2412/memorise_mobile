@@ -99,8 +99,10 @@ void main() async {
               MemoryInviteViewModel(context.read<MemoryRepository>()),
         ),
         ChangeNotifierProvider(
-          create: (context) =>
-              MemoryCreationViewModel(context.read<MemoryRepository>()),
+          create: (context) => MemoryCreationViewModel(
+            context.read<MemoryRepository>(),
+            context.read<PhotoRepository>(),
+          ),
         ),
       ],
       child: const MemoriseApp(),

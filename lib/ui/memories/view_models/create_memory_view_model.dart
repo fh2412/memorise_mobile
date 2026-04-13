@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:memorise_mobile/data/repositories/memory_repository.dart';
+import 'package:memorise_mobile/data/repositories/photo_repository.dart';
 import 'package:memorise_mobile/data/services/snackbar_service.dart';
 import 'package:memorise_mobile/domain/models/friends_model.dart';
 import 'package:memorise_mobile/domain/models/location_model.dart';
@@ -8,6 +9,7 @@ import 'package:memorise_mobile/domain/models/memory_model.dart';
 
 class MemoryCreationViewModel extends ChangeNotifier {
   final MemoryRepository _repository;
+  final PhotoRepository _photoRepository;
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final titleController = TextEditingController();
@@ -19,7 +21,7 @@ class MemoryCreationViewModel extends ChangeNotifier {
 
   List<MemoryMissingFriend> get selectedUsers => _repository.selectedUsers;
 
-  MemoryCreationViewModel(this._repository);
+  MemoryCreationViewModel(this._repository, this._photoRepository);
 
   int? memoryId;
 
@@ -28,6 +30,9 @@ class MemoryCreationViewModel extends ChangeNotifier {
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+
+  bool _isUPLoading = false;
+  bool get isUPLoading => _isUPLoading;
 
   bool get isMetadataValid {
     return titleController.text.isNotEmpty && startDate != null;
@@ -78,13 +83,7 @@ class MemoryCreationViewModel extends ChangeNotifier {
     } else if (_currentStep == 1) {
       setStep(_currentStep + 1);
     } else if (_currentStep == 2) {
-      print('creating memory!');
-      // Upload Images and add Friends
-      addFriendsToMemory(memoryId.toString(), selectedUsers);
-      // Clear both as well
-      _repository.clearSelectedUsers();
-      _isLoading = false;
-      notifyListeners();
+      finalizeCreation();
     }
   }
 
@@ -148,8 +147,6 @@ class MemoryCreationViewModel extends ChangeNotifier {
     String memoryId,
     List<MemoryMissingFriend> friendsToAdd,
   ) async {
-    _isLoading = true;
-    notifyListeners();
     List<String> emails = friendsToAdd.map((friend) => friend.email).toList();
     try {
       await _repository.addFriendsToMemory(memoryId, emails);
@@ -161,7 +158,44 @@ class MemoryCreationViewModel extends ChangeNotifier {
       return false;
     } finally {
       _repository.clearSelectedUsers();
-      _isLoading = false;
+    }
+  }
+
+  Future<void> executeUpload(int memoryId) async {
+    try {
+      await _photoRepository.uploadMemoryPhotos(memoryId: memoryId.toString());
+
+      _photoRepository.clearPhotos();
+      SnackBarService.show("Memories uploaded successfully!");
+    } catch (e) {
+      SnackBarService.show("Upload failed: $e", isError: true);
+    } finally {
+      _isUPLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> finalizeCreation() async {
+    if (memoryId == null) return false;
+
+    _isUPLoading = true;
+    notifyListeners();
+
+    try {
+      await Future.wait([
+        addFriendsToMemory(memoryId.toString(), selectedUsers),
+        executeUpload(memoryId!),
+      ]);
+
+      _repository.clearSelectedUsers();
+      _photoRepository.clearPhotos();
+
+      return true;
+    } catch (e) {
+      debugPrint("Finalize Error: $e");
+      return false;
+    } finally {
+      _isUPLoading = false;
       notifyListeners();
     }
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memorise_mobile/ui/memories/view_models/create_memory_view_model.dart';
+import 'package:memorise_mobile/ui/memories/views/photo_selection.dart';
 import 'package:memorise_mobile/ui/user/views/friends_selection_view.dart';
 import 'package:provider/provider.dart';
 
@@ -11,6 +12,36 @@ class CreateMemoryScreen extends StatefulWidget {
 }
 
 class _CreateMemoryScreenState extends State<CreateMemoryScreen> {
+  void _handleFinish(MemoryCreationViewModel vm) async {
+    // 1. Show the Loading Dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false, // User can't click away
+      builder: (context) => const AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text("Creating your memory..."),
+          ],
+        ),
+      ),
+    );
+
+    // 2. Trigger the logic
+    bool success = await vm.finalizeCreation();
+
+    // 3. Close the Loading Dialog
+    if (mounted) Navigator.of(context).pop();
+
+    // 4. If successful, go back to the Home/Feed screen
+    if (success && mounted) {
+      // Use pushNamedAndRemoveUntil or pop depending on your route logic
+      Navigator.of(context).pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Assuming ViewModel is provided higher up the tree
@@ -43,7 +74,13 @@ class _CreateMemoryScreenState extends State<CreateMemoryScreen> {
             type: StepperType.horizontal,
             elevation: 0, // Keeps it flat and clean for M3
             currentStep: vm.currentStep,
-            onStepContinue: () => vm.nextStep(),
+            onStepContinue: () {
+              if (vm.currentStep == 2) {
+                _handleFinish(vm);
+              } else {
+                vm.nextStep();
+              }
+            },
             onStepCancel: vm.previousStep,
             // Customizing controls to use M3 buttons
             controlsBuilder: (context, details) {
@@ -84,20 +121,18 @@ class _CreateMemoryScreenState extends State<CreateMemoryScreen> {
                 isActive: vm.currentStep >= 1,
                 title: const Text("Friends"),
                 content: SizedBox(
-                  height: 500, // Give it a specific "box" to live in
+                  height: 500,
                   child: FriendsSelectionStep(memoryId: vm.memoryId.toString()),
                 ),
               ),
               Step(
                 isActive: vm.currentStep >= 2,
                 title: const Text("Photos"),
-                content: const Card(
-                  child: SizedBox(
-                    height: 200,
-                    width: double.infinity,
-                    child: Center(child: Text("Photo Grid")),
-                  ),
-                ),
+                content: vm.memoryId == null
+                    ? const Center(
+                        child: Text("Please complete the first step first."),
+                      )
+                    : PhotoSelection(memoryId: vm.memoryId!),
               ),
             ],
           ),
