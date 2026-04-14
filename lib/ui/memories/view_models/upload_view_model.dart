@@ -40,7 +40,10 @@ class UploadViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _repository.uploadMemoryPhotos(memoryId: memoryId.toString());
+      await _repository.uploadMemoryPhotos(
+        memoryId: memoryId.toString(),
+        isNew: false,
+      );
 
       _repository.clearPhotos();
       SnackBarService.show("Memories uploaded successfully!");

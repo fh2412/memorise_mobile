@@ -35,6 +35,7 @@ class PhotoRepository {
   Future<void> uploadMemoryPhotos({
     required String memoryId,
     String? userId,
+    required bool isNew,
   }) async {
     // 1. Validate inputs
     if (selectedPhotosNotifier.value.isEmpty) return;
@@ -49,6 +50,7 @@ class PhotoRepository {
       memoryId: memoryId,
       files: selectedPhotosNotifier.value,
       userId: activeUserId,
+      isNew: isNew,
     );
   }
 
@@ -56,24 +58,39 @@ class PhotoRepository {
     required String memoryId,
     required List<XFile> files,
     required String userId,
+    required bool isNew,
   }) async {
-    // 1. Upload all photos to Firebase in parallel
-    final uploadTasks = files.map((file) async {
-      // Get dimensions before uploading
+    if (files.isEmpty) return;
+
+    // 1. Prepare upload tasks
+    // We use .asMap() to identify the first index (0)
+    final uploadTasks = files.asMap().entries.map((entry) async {
+      final int index = entry.key;
+      final XFile file = entry.value;
+      final bool isFirst = index == 0 && isNew;
+
       final image = await getImageDimensions(file);
 
+      // Assuming uploadMemoryPicture returns the download URL String
       return _uploadService.uploadMemoryPicture(
         memoryId: memoryId,
         xFile: file,
         userId: userId,
-        isStarred: false, // Defaulting to false for batch upload
+        isStarred: isFirst, // First image gets starred
         width: image.width,
         height: image.height,
       );
     });
 
-    await Future.wait(uploadTasks);
+    // 2. Wait for all uploads to complete and collect URLs
+    final List<String> uploadedUrls = await Future.wait(uploadTasks);
 
+    // 3. Update the title picture using the first URL
+    if (uploadedUrls.isNotEmpty && isNew) {
+      await _apiService.updateTitlePic(uploadedUrls.first, memoryId);
+    }
+
+    // 4. Sync the total count
     await _apiService.updatePictureCount(memoryId, files.length);
   }
 }

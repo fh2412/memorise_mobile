@@ -241,6 +241,13 @@ class ApiService {
     );
   }
 
+  Future<void> updateTitlePic(String titlepic, String memoryId) async {
+    await _dio.put(
+      '/memories/updateTitlePic/$memoryId',
+      data: {'imageUrl': titlepic},
+    );
+  }
+
   Future<void> createLocation(MemoriseLocation location) async {
     final locationId = await _dio.post(
       '/locations/createLocation',

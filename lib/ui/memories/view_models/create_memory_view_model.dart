@@ -163,7 +163,10 @@ class MemoryCreationViewModel extends ChangeNotifier {
 
   Future<void> executeUpload(int memoryId) async {
     try {
-      await _photoRepository.uploadMemoryPhotos(memoryId: memoryId.toString());
+      await _photoRepository.uploadMemoryPhotos(
+        memoryId: memoryId.toString(),
+        isNew: true,
+      );
 
       _photoRepository.clearPhotos();
       SnackBarService.show("Memories uploaded successfully!");
