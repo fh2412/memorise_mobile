@@ -1,6 +1,7 @@
 class MemoriseLocation {
   final double latitude;
   final double longitude;
+  final String address;
   final String country;
   final String countryCode;
   final String? city;
@@ -9,6 +10,7 @@ class MemoriseLocation {
   MemoriseLocation({
     required this.latitude,
     required this.longitude,
+    required this.address,
     required this.country,
     required this.countryCode,
     this.city,
@@ -20,6 +22,7 @@ class MemoriseLocation {
     return MemoriseLocation(
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
+      address: json['address'] as String,
       country: json['country'] as String,
       countryCode: json['countryCode'] as String,
       city: json['city'] as String?,
@@ -32,6 +35,7 @@ class MemoriseLocation {
     return {
       'latitude': latitude,
       'longitude': longitude,
+      'address': address,
       'country': country,
       'countryCode': countryCode,
       'city': city,

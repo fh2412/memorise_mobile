@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:memorise_mobile/data/services/google_places_service.dart';
 import 'package:memorise_mobile/ui/memories/view_models/create_memory_view_model.dart';
 import 'package:memorise_mobile/ui/memories/views/photo_selection.dart';
 import 'package:memorise_mobile/ui/user/views/friends_selection_view.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
 
 class CreateMemoryScreen extends StatefulWidget {
   const CreateMemoryScreen({super.key});
@@ -216,19 +218,36 @@ class MetadataStep extends StatelessWidget {
         const SizedBox(height: 24),
 
         // LOCATION SECTION
-        InputDecorator(
-          decoration: const InputDecoration(
-            labelText: "Location",
-            prefixIcon: Icon(Icons.location_on_outlined),
-          ),
-          child: Text(
-            vm.selectedLocationName ?? "No location selected",
-            style: TextStyle(
-              color: vm.selectedLocationName == null
-                  ? colorScheme.outline
-                  : null,
-            ),
-          ),
+        Autocomplete<PlacePrediction>(
+          displayStringForOption: (PlacePrediction p) => p.description,
+          optionsBuilder: (TextEditingValue textEditingValue) async {
+            return await vm.searchAddress(textEditingValue.text);
+          },
+          onSelected: (PlacePrediction p) {
+            vm.selectPlace(p);
+          },
+          fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+            return TextFormField(
+              controller: controller,
+              focusNode: focusNode,
+              decoration: InputDecoration(
+                labelText: "Location",
+                prefixIcon: const Icon(Icons.location_on_outlined),
+                // TIP: Visual feedback for the user during API calls
+                suffixIcon: vm.isSearching
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: Padding(
+                          padding: EdgeInsets.all(12.0),
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      )
+                    : null,
+                border: const OutlineInputBorder(),
+              ),
+            );
+          },
         ),
         const SizedBox(height: 12),
         Row(
@@ -244,10 +263,10 @@ class MetadataStep extends StatelessWidget {
             Expanded(
               child: OutlinedButton.icon(
                 onPressed: () {
-                  // TODO: Open Choose Location Widget
+                  // You could still open a full-screen map picker here if desired
                 },
                 icon: const Icon(Icons.map_outlined, size: 18),
-                label: const Text("Choose"),
+                label: const Text("Choose on Map"),
               ),
             ),
           ],

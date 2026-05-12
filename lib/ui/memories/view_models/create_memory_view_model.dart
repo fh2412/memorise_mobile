@@ -1,11 +1,16 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:memorise_mobile/data/repositories/memory_repository.dart';
 import 'package:memorise_mobile/data/repositories/photo_repository.dart';
+import 'package:memorise_mobile/data/services/location_service.dart';
 import 'package:memorise_mobile/data/services/snackbar_service.dart';
 import 'package:memorise_mobile/domain/models/friends_model.dart';
 import 'package:memorise_mobile/domain/models/location_model.dart';
 import 'package:memorise_mobile/domain/models/memory_model.dart';
+import 'package:memorise_mobile/data/services/google_places_service.dart';
 
 class MemoryCreationViewModel extends ChangeNotifier {
   final MemoryRepository _repository;
@@ -17,7 +22,10 @@ class MemoryCreationViewModel extends ChangeNotifier {
   bool isActive = true;
   DateTime? startDate;
   DateTime? endDate;
+
   String? selectedLocationName;
+  MemoriseLocation? _selectedLocation;
+  final TextEditingController locationController = TextEditingController();
 
   List<MemoryMissingFriend> get selectedUsers => _repository.selectedUsers;
 
@@ -37,6 +45,12 @@ class MemoryCreationViewModel extends ChangeNotifier {
   bool get isMetadataValid {
     return titleController.text.isNotEmpty && startDate != null;
   }
+
+  bool _isSearching = false;
+  bool get isSearching => _isSearching;
+
+  Timer? _debounce;
+  final _placesService = GooglePlacesService("YOUR_API_KEY");
 
   void handleBackAction() {
     if (memoryId != null) {
@@ -95,9 +109,9 @@ class MemoryCreationViewModel extends ChangeNotifier {
   }
 
   Future<int> createBasicMemory() async {
-    print('Creating Memory');
     _isLoading = true;
     notifyListeners();
+
     final memory = CreateMemory(
       userId: FirebaseAuth.instance.currentUser!.uid,
       title: titleController.text,
@@ -108,16 +122,10 @@ class MemoryCreationViewModel extends ChangeNotifier {
       titlePic: '',
       activityId: 1,
     );
-    final location = MemoriseLocation(
-      latitude: 0.0,
-      longitude: 0.0,
-      country: '',
-      countryCode: '',
-      locationId: 1,
-    );
+
     return _repository.saveMemory(
       memory: memory,
-      location: location,
+      location: _selectedLocation,
       isNew: true,
     );
   }
@@ -219,14 +227,86 @@ class MemoryCreationViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setLocation(String name) {
-    selectedLocationName = name;
+  void setLocation(MemoriseLocation location) {
+    _selectedLocation = location;
+    selectedLocationName = location.address;
+    locationController.text = location.address;
     notifyListeners();
   }
 
   Future<void> fetchCurrentLocation() async {
-    // Logic for GPS will go here
-    setLocation("Current GPS Location");
+    try {
+      final position = await LocationService().getCurrentLocation();
+      if (position != null) {
+        // Use geocoding to get the address from coordinates
+        List<Placemark> placemarks = await placemarkFromCoordinates(
+          position.latitude,
+          position.longitude,
+        );
+
+        Placemark place = placemarks.first;
+
+        setLocation(
+          MemoriseLocation(
+            locationId: 0,
+            latitude: position.latitude,
+            longitude: position.longitude,
+            address: "${place.street}, ${place.postalCode} ${place.locality}",
+            country: place.country ?? '',
+            countryCode: place.isoCountryCode ?? '',
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  Future<List<PlacePrediction>> searchAddress(String query) async {
+    if (query.isEmpty) return [];
+
+    // Debounce logic remains the same...
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    Completer<List<PlacePrediction>> completer = Completer();
+
+    _debounce = Timer(const Duration(milliseconds: 500), () async {
+      _setSearching(true);
+      try {
+        final results = await _placesService.getAutocomplete(query);
+        completer.complete(results);
+      } catch (e) {
+        completer.complete([]);
+      } finally {
+        _setSearching(false);
+      }
+    });
+
+    return completer.future;
+  }
+
+  Future<void> selectPlace(PlacePrediction prediction) async {
+    try {
+      final details = await _placesService.getPlaceDetails(prediction.placeId);
+      final location = details['geometry']['location'];
+
+      setLocation(
+        MemoriseLocation(
+          latitude: location['lat'],
+          longitude: location['lng'],
+          address: prediction.description,
+          country: '',
+          countryCode: '',
+          locationId: 0,
+        ),
+      );
+    } catch (e) {
+      debugPrint("Error fetching details: $e");
+    }
+  }
+
+  void _setSearching(bool value) {
+    _isSearching = value;
+    notifyListeners();
   }
 
   @override
