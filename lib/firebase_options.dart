@@ -47,7 +47,7 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDGskWsqP1j_ztzWCPCxcgYwapBY1up60I',
+    apiKey: 'AIzaSyA3hKoI7dwkF4Ls2IC3zrngvXJpf3A0Hg0',
     appId: '1:541746469592:web:6042f95dca1cb87ba215ad',
     messagingSenderId: '541746469592',
     projectId: 'memorise-910c3',
@@ -57,7 +57,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyA_-Jw6QHd7OcT_BIn7t5CzvOuXbHGBuF4',
+    apiKey: 'AIzaSyDS7n2la2TL6OO9UotmoAirk493vkidmkg',
     appId: '1:541746469592:android:f74e1a6f315c9993a215ad',
     messagingSenderId: '541746469592',
     projectId: 'memorise-910c3',
@@ -65,7 +65,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCA-Z6NCc9-RdllKe5WSlJE0EeKE3uz5a8',
+    apiKey: 'AIzaSyCZJxnfPUBi9XqVf8ZYjOgFVQ3YRJoVrRQ',
     appId: '1:541746469592:ios:38d5ac2002f104c9a215ad',
     messagingSenderId: '541746469592',
     projectId: 'memorise-910c3',
