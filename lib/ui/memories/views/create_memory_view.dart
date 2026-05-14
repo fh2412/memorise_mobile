@@ -218,6 +218,7 @@ class MetadataStep extends StatelessWidget {
         const SizedBox(height: 24),
 
         // LOCATION SECTION
+        // LOCATION SECTION
         Autocomplete<PlacePrediction>(
           displayStringForOption: (PlacePrediction p) => p.description,
           optionsBuilder: (TextEditingValue textEditingValue) async {
@@ -230,47 +231,30 @@ class MetadataStep extends StatelessWidget {
             return TextFormField(
               controller: controller,
               focusNode: focusNode,
+              // Matching the style of your Description field
               decoration: InputDecoration(
                 labelText: "Location",
                 prefixIcon: const Icon(Icons.location_on_outlined),
-                // TIP: Visual feedback for the user during API calls
+                // Integrated Suffix: Swaps between a loader and the location button
                 suffixIcon: vm.isSearching
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: Padding(
-                          padding: EdgeInsets.all(12.0),
+                    ? const Padding(
+                        padding: EdgeInsets.all(12.0),
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         ),
                       )
-                    : null,
-                border: const OutlineInputBorder(),
+                    : IconButton(
+                        icon: const Icon(Icons.my_location, size: 20),
+                        tooltip: "Use current location",
+                        onPressed: vm.fetchCurrentLocation,
+                      ),
               ),
             );
           },
         ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: FilledButton.tonalIcon(
-                onPressed: vm.fetchCurrentLocation,
-                icon: const Icon(Icons.my_location, size: 18),
-                label: const Text("Current"),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  // You could still open a full-screen map picker here if desired
-                },
-                icon: const Icon(Icons.map_outlined, size: 18),
-                label: const Text("Choose on Map"),
-              ),
-            ),
-          ],
-        ),
+        const SizedBox(height: 24), // Consistent spacing with the first field
       ],
     );
   }
