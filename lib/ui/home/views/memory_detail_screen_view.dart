@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:memorise_mobile/domain/models/friends_model.dart';
 import 'package:memorise_mobile/domain/models/memory_model.dart';
 import 'package:memorise_mobile/domain/models/user_model.dart';
@@ -27,6 +28,14 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
         widget.memoryId.toString(),
       );
     });
+  }
+
+  late GoogleMapController mapController;
+
+  final LatLng _center = const LatLng(45.521563, -122.677433);
+
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
   }
 
   @override
@@ -205,22 +214,12 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
                         ), // M3 uses larger radii
                       ),
                       child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.map_outlined,
-                              size: 40,
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              "Lat: ${memory.latitude}, Lng: ${memory.longitude}",
-                              style: textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
+                        child: GoogleMap(
+                          onMapCreated: _onMapCreated,
+                          initialCameraPosition: CameraPosition(
+                            target: const LatLng(45.521563, -122.677433),
+                            zoom: 11.0,
+                          ),
                         ),
                       ),
                     ),
