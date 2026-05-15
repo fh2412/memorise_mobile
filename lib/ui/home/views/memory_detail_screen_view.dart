@@ -183,6 +183,7 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
                     vm.creator!,
                     vm.selectedMemory!,
                   ),
+                  const SizedBox(height: 16),
 
                   // 5. MAP SECTION (M3 Container style)
                   if (memory.latitude != null) ...[

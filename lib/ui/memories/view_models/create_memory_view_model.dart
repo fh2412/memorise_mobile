@@ -50,7 +50,9 @@ class MemoryCreationViewModel extends ChangeNotifier {
   bool get isSearching => _isSearching;
 
   Timer? _debounce;
-  final _placesService = GooglePlacesService("YOUR_API_KEY");
+  final _placesService = GooglePlacesService(
+    "AIzaSyA7jSHW0sP19toXvaDbbZ1ZoztbAZ0qFMI",
+  );
 
   void handleBackAction() {
     if (memoryId != null) {
@@ -231,6 +233,7 @@ class MemoryCreationViewModel extends ChangeNotifier {
     _selectedLocation = location;
     selectedLocationName = location.address;
     locationController.text = location.address;
+    print('Locations has be set to $location');
     notifyListeners();
   }
 

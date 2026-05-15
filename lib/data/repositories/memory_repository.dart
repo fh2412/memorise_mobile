@@ -51,7 +51,26 @@ class MemoryRepository {
   }
 
   Future<Memory> fetchMemoryDetails({required String memoryId}) async {
-    return await _apiService.getMemoryDetails(memoryId);
+    final rawMemory = await _apiService.getMemoryDetails(memoryId);
+    final int locationId = rawMemory.locationId;
+    final MemoriseLocation location = await _apiService.getLocation(locationId);
+
+    return Memory(
+      memoryId: rawMemory.memoryId,
+      userId: rawMemory.userId,
+      imageUrl: rawMemory.imageUrl,
+      latitude: location.latitude,
+      longitude: location.longitude,
+      locationId: locationId,
+      memoryDate: rawMemory.memoryDate,
+      memoryEndDate: rawMemory.memoryEndDate,
+      pictureCount: rawMemory.pictureCount,
+      text: rawMemory.text,
+      title: rawMemory.title,
+      titlePic: rawMemory.titlePic,
+      username: '',
+      activityId: 1,
+    );
   }
 
   Future<List<MemoryAttendee>> fetchMemoryDetailsFriends({

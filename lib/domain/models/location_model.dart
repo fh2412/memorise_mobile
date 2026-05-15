@@ -20,14 +20,21 @@ class MemoriseLocation {
   // Factory method to create an instance from JSON
   factory MemoriseLocation.fromJson(Map<String, dynamic> json) {
     return MemoriseLocation(
-      latitude: (json['latitude'] as num).toDouble(),
-      longitude: (json['longitude'] as num).toDouble(),
-      address: json['address'] as String,
-      country: json['country'] as String,
-      countryCode: json['countryCode'] as String,
-      city: json['city'] as String?,
+      latitude: _toDouble(json['latitude']),
+      longitude: _toDouble(json['longitude']),
+      address: json['address'] as String? ?? 'Unknown Address',
+      country: json['country'] as String? ?? '',
+      countryCode: json['alpha_2_codes'] as String? ?? '',
+      city: json['locality'] as String?,
       locationId: json['location_id'] as int,
     );
+  }
+
+  static double _toDouble(dynamic value) {
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0.0;
+    return 0.0;
   }
 
   // Method to convert an instance to JSON

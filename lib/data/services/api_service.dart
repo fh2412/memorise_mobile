@@ -118,7 +118,7 @@ class ApiService {
   Future<Memory> getMemoryDetails(String memoryId) async {
     try {
       final response = await _dio.get('/memories/$memoryId');
-
+      print("Memory Details: $response");
       return Memory.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Failed to load memory details: ${e.message}');
@@ -246,6 +246,16 @@ class ApiService {
       '/memories/updateTitlePic/$memoryId',
       data: {'imageUrl': titlepic},
     );
+  }
+
+  Future<MemoriseLocation> getLocation(int locationId) async {
+    try {
+      final response = await _dio.get('/locations/$locationId');
+      print(response.data);
+      return MemoriseLocation.fromJson(response.data);
+    } on DioException catch (e) {
+      throw Exception('Invalid or expired invite link: $e');
+    }
   }
 
   Future<void> createLocation(MemoriseLocation location) async {
