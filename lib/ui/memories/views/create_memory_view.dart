@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:memorise_mobile/data/services/google_places_service.dart';
+import 'package:memorise_mobile/domain/models/google_places_model.dart';
 import 'package:memorise_mobile/ui/memories/view_models/create_memory_view_model.dart';
 import 'package:memorise_mobile/ui/memories/views/photo_selection.dart';
 import 'package:memorise_mobile/ui/user/views/friends_selection_view.dart';
@@ -147,7 +147,6 @@ class MetadataStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<MemoryCreationViewModel>();
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -218,7 +217,6 @@ class MetadataStep extends StatelessWidget {
         const SizedBox(height: 24),
 
         // LOCATION SECTION
-        // LOCATION SECTION
         Autocomplete<PlacePrediction>(
           displayStringForOption: (PlacePrediction p) => p.description,
           optionsBuilder: (TextEditingValue textEditingValue) async {
@@ -231,11 +229,9 @@ class MetadataStep extends StatelessWidget {
             return TextFormField(
               controller: controller,
               focusNode: focusNode,
-              // Matching the style of your Description field
               decoration: InputDecoration(
                 labelText: "Location",
                 prefixIcon: const Icon(Icons.location_on_outlined),
-                // Integrated Suffix: Swaps between a loader and the location button
                 suffixIcon: vm.isSearching
                     ? const Padding(
                         padding: EdgeInsets.all(12.0),

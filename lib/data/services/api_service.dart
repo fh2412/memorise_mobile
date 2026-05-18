@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:memorise_mobile/domain/models/friends_model.dart';
+import 'package:memorise_mobile/domain/models/google_places_model.dart';
 import 'package:memorise_mobile/domain/models/location_model.dart';
 import 'package:memorise_mobile/domain/models/memory_model.dart';
 import 'package:memorise_mobile/domain/models/responses.dart';
@@ -274,5 +275,33 @@ class ApiService {
 
   Future<void> deleteMemory(String memoryId) async {
     await _dio.delete('/memories/$memoryId');
+  }
+
+  Future<List<PlacePrediction>> getAutocomplete(String input) async {
+    if (input.isEmpty) return [];
+
+    try {
+      final response = await _dio.get(
+        '/locations/autocomplete',
+        queryParameters: {'input': input},
+      );
+      print(response.data);
+
+      final List data = response.data;
+      return data.map((p) => PlacePrediction.fromJson(p)).toList();
+    } on DioException catch (e) {
+      throw Exception('Failed to fetch autocomplete predictions: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> getPlaceDetails(String placeId) async {
+    try {
+      final response = await _dio.get('/locations/details/$placeId');
+      print(response.data);
+
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw Exception('Failed to fetch place details: $e');
+    }
   }
 }

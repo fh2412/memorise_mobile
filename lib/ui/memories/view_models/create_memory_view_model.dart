@@ -8,9 +8,9 @@ import 'package:memorise_mobile/data/repositories/photo_repository.dart';
 import 'package:memorise_mobile/data/services/location_service.dart';
 import 'package:memorise_mobile/data/services/snackbar_service.dart';
 import 'package:memorise_mobile/domain/models/friends_model.dart';
+import 'package:memorise_mobile/domain/models/google_places_model.dart';
 import 'package:memorise_mobile/domain/models/location_model.dart';
 import 'package:memorise_mobile/domain/models/memory_model.dart';
-import 'package:memorise_mobile/data/services/google_places_service.dart';
 
 class MemoryCreationViewModel extends ChangeNotifier {
   final MemoryRepository _repository;
@@ -50,9 +50,6 @@ class MemoryCreationViewModel extends ChangeNotifier {
   bool get isSearching => _isSearching;
 
   Timer? _debounce;
-  final _placesService = GooglePlacesService(
-    "AIzaSyA7jSHW0sP19toXvaDbbZ1ZoztbAZ0qFMI",
-  );
 
   void handleBackAction() {
     if (memoryId != null) {
@@ -268,14 +265,13 @@ class MemoryCreationViewModel extends ChangeNotifier {
   Future<List<PlacePrediction>> searchAddress(String query) async {
     if (query.isEmpty) return [];
 
-    // Debounce logic remains the same...
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     Completer<List<PlacePrediction>> completer = Completer();
 
     _debounce = Timer(const Duration(milliseconds: 500), () async {
       _setSearching(true);
       try {
-        final results = await _placesService.getAutocomplete(query);
+        final results = await _repository.getAutocomplete(query);
         completer.complete(results);
       } catch (e) {
         completer.complete([]);
@@ -289,7 +285,7 @@ class MemoryCreationViewModel extends ChangeNotifier {
 
   Future<void> selectPlace(PlacePrediction prediction) async {
     try {
-      final details = await _placesService.getPlaceDetails(prediction.placeId);
+      final details = await _repository.getPlaceDetails(prediction.placeId);
       final location = details['geometry']['location'];
 
       setLocation(

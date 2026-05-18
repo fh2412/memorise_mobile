@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:memorise_mobile/data/services/api_service.dart';
 import 'package:memorise_mobile/domain/models/friends_model.dart';
+import 'package:memorise_mobile/domain/models/google_places_model.dart';
 import 'package:memorise_mobile/domain/models/location_model.dart';
 import 'package:memorise_mobile/domain/models/memory_model.dart';
 import 'package:memorise_mobile/domain/models/responses.dart';
@@ -112,7 +113,6 @@ class MemoryRepository {
     String userId,
     String memoryId,
   ) async {
-    // Calling your API service
     return await _apiService.getMemoryMissingFriends(userId, memoryId);
   }
 
@@ -161,6 +161,14 @@ class MemoryRepository {
 
   void clearSelectedUsers() {
     selectedUsersNotifier.value = [];
+  }
+
+  Future<List<PlacePrediction>> getAutocomplete(String input) async {
+    return await _apiService.getAutocomplete(input);
+  }
+
+  Future<Map<String, dynamic>> getPlaceDetails(String placeId) async {
+    return await _apiService.getPlaceDetails(placeId);
   }
 
   void dispose() {
