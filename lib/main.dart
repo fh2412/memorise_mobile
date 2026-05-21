@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:memorise_mobile/core/router.dart';
 import 'package:memorise_mobile/core/theme.dart';
 import 'package:memorise_mobile/data/repositories/auth_repository.dart';
+import 'package:memorise_mobile/data/repositories/location_repository.dart';
 import 'package:memorise_mobile/data/repositories/memory_repository.dart';
 import 'package:memorise_mobile/data/repositories/photo_repository.dart';
 import 'package:memorise_mobile/data/repositories/user_repository.dart';
@@ -47,6 +48,9 @@ void main() async {
         ),
         Provider(
           create: (context) => MemoryRepository(context.read<ApiService>()),
+        ),
+        Provider(
+          create: (context) => LocationRepository(context.read<ApiService>()),
         ),
         // In MultiProvider:
         ChangeNotifierProvider(create: (_) => UserRepository(ApiService())),
@@ -102,6 +106,7 @@ void main() async {
           create: (context) => MemoryCreationViewModel(
             context.read<MemoryRepository>(),
             context.read<PhotoRepository>(),
+            context.read<LocationRepository>(),
           ),
         ),
       ],

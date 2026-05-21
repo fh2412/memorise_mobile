@@ -259,7 +259,7 @@ class ApiService {
     }
   }
 
-  Future<void> createLocation(MemoriseLocation location) async {
+  Future<int> createLocation(MemoriseLocation location) async {
     final locationId = await _dio.post(
       '/locations/createLocation',
       data: {
@@ -285,7 +285,6 @@ class ApiService {
         '/locations/autocomplete',
         queryParameters: {'input': input},
       );
-      print(response.data);
 
       final List data = response.data;
       return data.map((p) => PlacePrediction.fromJson(p)).toList();
@@ -296,12 +295,20 @@ class ApiService {
 
   Future<Map<String, dynamic>> getPlaceDetails(String placeId) async {
     try {
-      final response = await _dio.get('/locations/details/$placeId');
-      print(response.data);
+      final response = await _dio.get(
+        '/locations/googleplaces/details/$placeId',
+      );
 
       return response.data as Map<String, dynamic>;
     } on DioException catch (e) {
       throw Exception('Failed to fetch place details: $e');
     }
+  }
+
+  Future<void> updateMemoryLocation(int memoryId, int locationId) async {
+    await _dio.put(
+      '/updateMemoryLocation/$memoryId',
+      data: {'locationId': locationId},
+    );
   }
 }

@@ -123,12 +123,6 @@ class MemoryRepository {
     int? memoryId,
   }) async {
     try {
-      // 1. Create the location first
-      //await _apiService.createLocation(location);
-
-      // 2. Create the memory
-      // Note: In a real scenario, you'd likely get a locationId back
-      // from the createLocation call to pass into the memory object.
       if (isNew) {
         return await _apiService.createMemory(memory);
       } else if (memoryId != null) {

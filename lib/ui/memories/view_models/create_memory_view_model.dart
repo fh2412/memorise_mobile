@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:memorise_mobile/data/repositories/location_repository.dart';
 import 'package:memorise_mobile/data/repositories/memory_repository.dart';
 import 'package:memorise_mobile/data/repositories/photo_repository.dart';
 import 'package:memorise_mobile/data/services/location_service.dart';
@@ -15,6 +16,7 @@ import 'package:memorise_mobile/domain/models/memory_model.dart';
 class MemoryCreationViewModel extends ChangeNotifier {
   final MemoryRepository _repository;
   final PhotoRepository _photoRepository;
+  final LocationRepository _locationRepository;
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final titleController = TextEditingController();
@@ -29,7 +31,11 @@ class MemoryCreationViewModel extends ChangeNotifier {
 
   List<MemoryMissingFriend> get selectedUsers => _repository.selectedUsers;
 
-  MemoryCreationViewModel(this._repository, this._photoRepository);
+  MemoryCreationViewModel(
+    this._repository,
+    this._photoRepository,
+    this._locationRepository,
+  );
 
   int? memoryId;
 
@@ -168,6 +174,24 @@ class MemoryCreationViewModel extends ChangeNotifier {
     }
   }
 
+  Future<bool> createAndAddLocation(MemoriseLocation location) async {
+    try {
+      final locationId = await _locationRepository.createLocation(
+        location: location,
+      );
+      print("Create Location $locationId");
+      await _locationRepository.updateMemoryLocation(memoryId!, locationId);
+      print("Location $locationId was added to Memory $memoryId");
+      return true;
+    } catch (e) {
+      SnackBarService.show('There was a Error adding the Location');
+      print('There was a Error adding the Location $e');
+      return false;
+    } finally {
+      _repository.clearSelectedUsers();
+    }
+  }
+
   Future<void> executeUpload(int memoryId) async {
     try {
       await _photoRepository.uploadMemoryPhotos(
@@ -194,6 +218,7 @@ class MemoryCreationViewModel extends ChangeNotifier {
     try {
       await Future.wait([
         addFriendsToMemory(memoryId.toString(), selectedUsers),
+        createAndAddLocation(_selectedLocation!),
         executeUpload(memoryId!),
       ]);
 
@@ -230,7 +255,6 @@ class MemoryCreationViewModel extends ChangeNotifier {
     _selectedLocation = location;
     selectedLocationName = location.address;
     locationController.text = location.address;
-    print('Locations has be set to $location');
     notifyListeners();
   }
 
