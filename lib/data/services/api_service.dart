@@ -251,7 +251,7 @@ class ApiService {
 
   Future<MemoriseLocation> getLocation(int locationId) async {
     try {
-      final response = await _dio.get('/locations/$locationId');
+      final response = await _dio.get('/locations/details/$locationId');
       print(response.data);
       return MemoriseLocation.fromJson(response.data);
     } on DioException catch (e) {
@@ -267,7 +267,7 @@ class ApiService {
         'countryCode': location.countryCode,
         'city': location.city,
         'latitude': location.latitude,
-        'longitude': location.latitude,
+        'longitude': location.longitude,
       },
     );
     print("LocationID: ${response.data['locationId'] as int}");

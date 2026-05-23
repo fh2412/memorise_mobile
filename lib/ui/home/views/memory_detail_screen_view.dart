@@ -32,8 +32,6 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
 
   late GoogleMapController mapController;
 
-  final LatLng _center = const LatLng(45.521563, -122.677433);
-
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
@@ -59,6 +57,10 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
     }
 
     final memory = vm.selectedMemory;
+
+    final lat = memory?.latitude;
+    final lng = memory?.longitude;
+
     if (memory == null) return const Scaffold();
 
     return Scaffold(
@@ -195,7 +197,7 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
                   const SizedBox(height: 16),
 
                   // 5. MAP SECTION (M3 Container style)
-                  if (memory.latitude != null) ...[
+                  if (lat != null && lng != null) ...[
                     Text(
                       "Location",
                       style: textTheme.titleMedium?.copyWith(
@@ -206,6 +208,7 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
                     Container(
                       height: 200,
                       width: double.infinity,
+                      clipBehavior: Clip.antiAlias,
                       decoration: BoxDecoration(
                         // M3 "Surface Container" color
                         color: colorScheme.surfaceContainerHighest,
@@ -217,9 +220,25 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
                         child: GoogleMap(
                           onMapCreated: _onMapCreated,
                           initialCameraPosition: CameraPosition(
-                            target: const LatLng(45.521563, -122.677433),
+                            target: LatLng(lat, lng),
                             zoom: 11.0,
                           ),
+                          markers: {
+                            Marker(
+                              markerId: const MarkerId('memory_location'),
+                              position: LatLng(lat, lng),
+                            ),
+                          },
+                          liteModeEnabled:
+                              true, // Optimized static image mode for Android
+                          rotateGesturesEnabled: false,
+                          scrollGesturesEnabled: false,
+                          tiltGesturesEnabled: false,
+                          zoomGesturesEnabled: false,
+                          myLocationButtonEnabled:
+                              false, // Hides the "center on me" button
+                          mapToolbarEnabled:
+                              false, // Hides Android navigation shortcut buttons
                         ),
                       ),
                     ),
