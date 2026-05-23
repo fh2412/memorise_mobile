@@ -260,7 +260,7 @@ class ApiService {
   }
 
   Future<int> createLocation(MemoriseLocation location) async {
-    final locationId = await _dio.post(
+    final response = await _dio.post(
       '/locations/createLocation',
       data: {
         'country': location.country,
@@ -270,7 +270,8 @@ class ApiService {
         'longitude': location.latitude,
       },
     );
-    return locationId.data;
+    print("LocationID: ${response.data['locationId'] as int}");
+    return response.data['locationId'] as int;
   }
 
   Future<void> deleteMemory(String memoryId) async {
@@ -293,13 +294,13 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> getPlaceDetails(String placeId) async {
+  Future<MemoriseLocation> getPlaceDetails(String placeId) async {
     try {
       final response = await _dio.get(
         '/locations/googleplaces/details/$placeId',
       );
 
-      return response.data as Map<String, dynamic>;
+      return MemoriseLocation.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Failed to fetch place details: $e');
     }
@@ -307,7 +308,7 @@ class ApiService {
 
   Future<void> updateMemoryLocation(int memoryId, int locationId) async {
     await _dio.put(
-      '/updateMemoryLocation/$memoryId',
+      '/memories/updateMemoryLocation/$memoryId',
       data: {'locationId': locationId},
     );
   }

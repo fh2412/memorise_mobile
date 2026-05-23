@@ -118,7 +118,6 @@ class MemoryRepository {
 
   Future<int> saveMemory({
     required CreateMemory memory,
-    MemoriseLocation? location,
     required bool isNew,
     int? memoryId,
   }) async {
@@ -161,7 +160,7 @@ class MemoryRepository {
     return await _apiService.getAutocomplete(input);
   }
 
-  Future<Map<String, dynamic>> getPlaceDetails(String placeId) async {
+  Future<MemoriseLocation> getPlaceDetails(String placeId) async {
     return await _apiService.getPlaceDetails(placeId);
   }
 

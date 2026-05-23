@@ -127,12 +127,11 @@ class MemoryCreationViewModel extends ChangeNotifier {
       titlePic: '',
       activityId: 1,
     );
-
-    return _repository.saveMemory(
-      memory: memory,
-      location: _selectedLocation,
-      isNew: true,
+    print(
+      "Selected Location: lat: ${_selectedLocation!.latitude}, lng: ${_selectedLocation!.longitude}, country: ${_selectedLocation!.country}, , countryCode: ${_selectedLocation!.countryCode}, , city: ${_selectedLocation!.city}",
     );
+
+    return _repository.saveMemory(memory: memory, isNew: true);
   }
 
   Future<int> updateMemory() async {
@@ -179,7 +178,6 @@ class MemoryCreationViewModel extends ChangeNotifier {
       final locationId = await _locationRepository.createLocation(
         location: location,
       );
-      print("Create Location $locationId");
       await _locationRepository.updateMemoryLocation(memoryId!, locationId);
       print("Location $locationId was added to Memory $memoryId");
       return true;
@@ -309,19 +307,11 @@ class MemoryCreationViewModel extends ChangeNotifier {
 
   Future<void> selectPlace(PlacePrediction prediction) async {
     try {
-      final details = await _repository.getPlaceDetails(prediction.placeId);
-      final location = details['geometry']['location'];
-
-      setLocation(
-        MemoriseLocation(
-          latitude: location['lat'],
-          longitude: location['lng'],
-          address: prediction.description,
-          country: '',
-          countryCode: '',
-          locationId: 0,
-        ),
+      final locationDetails = await _repository.getPlaceDetails(
+        prediction.placeId,
       );
+
+      setLocation(locationDetails);
     } catch (e) {
       debugPrint("Error fetching details: $e");
     }
