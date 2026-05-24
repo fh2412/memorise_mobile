@@ -13,7 +13,7 @@ class _HomeViewState extends State<HomeView> {
   int _currentIndex = 0;
 
   // Titles for the AppBar
-  final List<String> _titles = ["Discovery", "My Memories"];
+  final List<String> _titles = ["Plans", "My Memories"];
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +47,7 @@ class _HomeViewState extends State<HomeView> {
           NavigationDestination(
             icon: Icon(Icons.explore_outlined),
             selectedIcon: Icon(Icons.explore),
-            label: 'Discovery',
+            label: 'Plans',
           ),
           NavigationDestination(
             icon: Icon(Icons.auto_awesome_outlined),
@@ -86,25 +86,25 @@ class DiscoveryView extends StatelessWidget {
             const SizedBox(height: 24),
             Text.rich(
               TextSpan(
-                text: 'You have not created any ',
+                text: 'Comming soon: ',
                 style: Theme.of(context).textTheme.bodyLarge,
                 children: [
                   TextSpan(
-                    text: 'MEMORIES',
+                    text: 'MEMORISE PLANS',
                     style: TextStyle(
                       color: secondaryColor,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const TextSpan(text: ' yet. Create one now and start '),
+                  const TextSpan(text: '\nTo help you plan your most '),
                   TextSpan(
-                    text: 'MEMORISING',
+                    text: 'EPIC',
                     style: TextStyle(
                       color: secondaryColor,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const TextSpan(text: '!'),
+                  const TextSpan(text: ' Memories!'),
                 ],
               ),
               textAlign: TextAlign.center,
