@@ -9,6 +9,7 @@ import 'package:memorise_mobile/ui/memories/views/upload_view.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:memorise_mobile/ui/home/view_models/memory_detail_screen_view_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MemoryDetailScreen extends StatefulWidget {
   final int memoryId;
@@ -229,18 +230,44 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
                               position: LatLng(lat, lng),
                             ),
                           },
-                          liteModeEnabled:
-                              true, // Optimized static image mode for Android
+                          liteModeEnabled: true,
                           rotateGesturesEnabled: false,
                           scrollGesturesEnabled: false,
                           tiltGesturesEnabled: false,
                           zoomGesturesEnabled: false,
-                          myLocationButtonEnabled:
-                              false, // Hides the "center on me" button
-                          mapToolbarEnabled:
-                              false, // Hides Android navigation shortcut buttons
+                          myLocationButtonEnabled: false,
+                          mapToolbarEnabled: false,
                         ),
                       ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        _buildM3Action(
+                          context,
+                          icon: Icons.map_outlined,
+                          label: "Open in Maps",
+                          onTap: () async {
+                            final googleMapsUrl = Uri.parse(
+                              'https://www.google.com/maps/search/?api=1&query=$lat,$lng',
+                            );
+
+                            try {
+                              if (await canLaunchUrl(googleMapsUrl)) {
+                                await launchUrl(
+                                  googleMapsUrl,
+                                  mode: LaunchMode
+                                      .externalApplication, // Forces it to open external maps app
+                                );
+                              } else {
+                                debugPrint("Could not launch maps URL");
+                              }
+                            } catch (e) {
+                              debugPrint("Error launching maps: $e");
+                            }
+                          },
+                        ),
+                      ],
                     ),
                   ],
                   const SizedBox(height: 50),
