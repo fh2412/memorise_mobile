@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:memorise_mobile/data/services/api_service.dart';
+import 'package:memorise_mobile/data/services/storage_service.dart';
 import 'package:memorise_mobile/domain/models/friends_model.dart';
 import 'package:memorise_mobile/domain/models/google_places_model.dart';
 import 'package:memorise_mobile/domain/models/location_model.dart';
@@ -11,6 +12,7 @@ import 'package:memorise_mobile/domain/models/user_model.dart';
 
 class MemoryRepository {
   final ApiService _apiService;
+  final StorageService _storageService;
 
   final ValueNotifier<List<MemoryMissingFriend>> selectedUsersNotifier =
       ValueNotifier<List<MemoryMissingFriend>>([]);
@@ -20,7 +22,7 @@ class MemoryRepository {
   final _memoryUpdateController = StreamController<String>.broadcast();
   Stream<String> get onMemoryUpdated => _memoryUpdateController.stream;
 
-  MemoryRepository(this._apiService);
+  MemoryRepository(this._apiService, this._storageService);
 
   Future<PaginatedMemoryResponse> fetchMemories({
     required String userId,
@@ -134,8 +136,24 @@ class MemoryRepository {
     }
   }
 
-  Future<void> deleteMemory(String memoryId) {
-    return _apiService.deleteMemory(memoryId);
+  Future<void> deleteMemory(int memoryId) {
+    return _apiService.deleteMemoryAndFriends(memoryId);
+  }
+
+  Future<void> completeMemoryDeletion({
+    required int memoryId,
+    required bool isFavourite,
+  }) async {
+    // Step 1: Handle conditional pin removal
+    if (isFavourite) {
+      await _apiService.deleteMemoryFromAllPins(memoryId);
+    }
+
+    // Step 2: Delete relational DB entry and friend links
+    await _apiService.deleteMemoryAndFriends(memoryId);
+
+    // Step 3: Clear asset storage footprint
+    await _storageService.deleteMemoryFolder(memoryId);
   }
 
   void toggleUserSelection(MemoryMissingFriend user) {

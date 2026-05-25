@@ -4,6 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:memorise_mobile/domain/models/friends_model.dart';
 import 'package:memorise_mobile/domain/models/memory_model.dart';
 import 'package:memorise_mobile/domain/models/user_model.dart';
+import 'package:memorise_mobile/ui/memories/views/edit_memory_dialog.dart';
 import 'package:memorise_mobile/ui/memories/views/photo_gallery_view.dart';
 import 'package:memorise_mobile/ui/memories/views/upload_view.dart';
 import 'package:provider/provider.dart';
@@ -76,7 +77,12 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
               IconButton(
                 icon: const Icon(Icons.edit),
                 onPressed: () {
-                  // Your Edit Logic
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return EditMemoryDialog(memory: memory);
+                    },
+                  );
                 },
               ),
             ],

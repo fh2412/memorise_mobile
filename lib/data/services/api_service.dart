@@ -274,7 +274,11 @@ class ApiService {
     return response.data['locationId'] as int;
   }
 
-  Future<void> deleteMemory(String memoryId) async {
+  Future<void> deleteMemoryFromAllPins(int memoryId) async {
+    await _dio.delete('/pinned/favourite-memorie/$memoryId');
+  }
+
+  Future<void> deleteMemoryAndFriends(int memoryId) async {
     await _dio.delete('/memories/$memoryId');
   }
 

@@ -58,9 +58,7 @@ class MemoryCreationViewModel extends ChangeNotifier {
   Timer? _debounce;
 
   void handleBackAction() {
-    if (memoryId != null) {
-      _repository.deleteMemory(memoryId.toString());
-    }
+    _repository.deleteMemory(memoryId!);
     clearForm();
   }
 

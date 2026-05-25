@@ -10,6 +10,7 @@ import 'package:memorise_mobile/data/repositories/user_repository.dart';
 import 'package:memorise_mobile/data/services/api_service.dart';
 import 'package:memorise_mobile/data/services/auth_service.dart';
 import 'package:memorise_mobile/data/services/snackbar_service.dart';
+import 'package:memorise_mobile/data/services/storage_service.dart';
 import 'package:memorise_mobile/data/services/upload_service.dart';
 import 'package:memorise_mobile/ui/auth/view_models/login_view_model.dart';
 import 'package:memorise_mobile/ui/auth/view_models/logout_view_model.dart';
@@ -17,6 +18,7 @@ import 'package:memorise_mobile/ui/home/view_models/home_view_model.dart';
 import 'package:memorise_mobile/ui/home/view_models/memory_detail_screen_view_model.dart';
 import 'package:memorise_mobile/ui/home/view_models/my_memories_screen_view_model.dart';
 import 'package:memorise_mobile/ui/memories/view_models/create_memory_view_model.dart';
+import 'package:memorise_mobile/ui/memories/view_models/edit_memory_view_model.dart';
 import 'package:memorise_mobile/ui/memories/view_models/upload_view_model.dart';
 import 'package:memorise_mobile/ui/user/view_models/edit_user_view_model.dart';
 import 'package:memorise_mobile/ui/user/view_models/friend_add_row_view_model.dart';
@@ -38,6 +40,7 @@ void main() async {
         Provider(create: (_) => AuthService()),
         Provider(create: (_) => ApiService()),
         Provider(create: (_) => UploadService()),
+        Provider(create: (_) => StorageService()),
         // 2. Initialize Repositories (Inject Service)
         ProxyProvider<AuthService, AuthRepository>(
           update: (_, service, __) => AuthRepository(service),
@@ -47,7 +50,10 @@ void main() async {
               PhotoRepository(uploadService, apiService),
         ),
         Provider(
-          create: (context) => MemoryRepository(context.read<ApiService>()),
+          create: (context) => MemoryRepository(
+            context.read<ApiService>(),
+            context.read<StorageService>(),
+          ),
         ),
         Provider(
           create: (context) => LocationRepository(context.read<ApiService>()),
@@ -108,6 +114,10 @@ void main() async {
             context.read<PhotoRepository>(),
             context.read<LocationRepository>(),
           ),
+        ),
+        ChangeNotifierProvider(
+          create: (context) =>
+              EditMemoryViewModel(context.read<MemoryRepository>()),
         ),
       ],
       child: const MemoriseApp(),
