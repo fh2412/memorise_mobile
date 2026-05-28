@@ -275,7 +275,7 @@ class ApiService {
   }
 
   Future<void> deleteMemoryFromAllPins(int memoryId) async {
-    await _dio.delete('/pinned/favourite-memorie/$memoryId');
+    await _dio.delete('/pinned/favourite-memory/$memoryId');
   }
 
   Future<void> deleteMemoryAndFriends(int memoryId) async {

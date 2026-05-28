@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memorise_mobile/domain/models/memory_model.dart';
+import 'package:memorise_mobile/ui/home/view_models/my_memories_screen_view_model.dart';
 import 'package:provider/provider.dart';
 import '../view_models/edit_memory_view_model.dart';
 
@@ -30,17 +31,12 @@ class _EditMemoryDialogState extends State<EditMemoryDialog> {
   }
 
   void _handleDelete(EditMemoryViewModel vm) async {
-    // 1. Read your favorite state (Assume your VM or Model tracks if it's pinned)
-    final isFavourite =
-        widget.memory.shareToken != null; // Substitute with actual flag check
-
-    // 2. Fire VM call
-    final success = await vm.deleteMemory(
-      widget.memory.memoryId,
-      isFavourite: isFavourite,
-    );
+    final success = await vm.deleteMemory(widget.memory.memoryId);
 
     if (success && mounted) {
+      context.read<MemoryViewModel>().removeMemoryFromList(
+        widget.memory.memoryId,
+      );
       Navigator.of(context).popUntil((route) => route.isFirst);
     }
   }

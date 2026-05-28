@@ -58,18 +58,42 @@ class MemoryCreationViewModel extends ChangeNotifier {
   Timer? _debounce;
 
   void handleBackAction() {
-    _repository.deleteMemory(memoryId!);
+    if (memoryId != null) {
+      _repository.deleteMemory(memoryId!);
+    }
     clearForm();
   }
 
   void clearForm() {
+    // 1. Clear text controllers
     titleController.clear();
     descriptionController.clear();
+    locationController.clear();
+
+    // 2. Reset form state if active
+    formKey.currentState?.reset();
+
+    // 3. Reset metadata and selections
+    isActive = true;
     startDate = null;
     endDate = null;
+    selectedLocationName = null;
+    _selectedLocation = null;
     memoryId = null;
-    // Clear any selected friends/photos too
+
+    // 4. Reset layout and workflow steps
     _currentStep = 0;
+
+    // 5. Reset internal state flags
+    _isLoading = false;
+    _isUPLoading = false;
+    _isSearching = false;
+
+    // 6. Clean up background timers
+    _debounce?.cancel();
+    _debounce = null;
+
+    // 7. Refresh the UI layer
     notifyListeners();
   }
 
@@ -125,9 +149,6 @@ class MemoryCreationViewModel extends ChangeNotifier {
       titlePic: '',
       activityId: 1,
     );
-    print(
-      "Selected Location: lat: ${_selectedLocation!.latitude}, lng: ${_selectedLocation!.longitude}, country: ${_selectedLocation!.country}, , countryCode: ${_selectedLocation!.countryCode}, , city: ${_selectedLocation!.city}",
-    );
 
     return _repository.saveMemory(memory: memory, isNew: true);
   }
@@ -160,7 +181,6 @@ class MemoryCreationViewModel extends ChangeNotifier {
     List<String> emails = friendsToAdd.map((friend) => friend.email).toList();
     try {
       await _repository.addFriendsToMemory(memoryId, emails);
-      SnackBarService.show('You have added new Friends to the Memory!');
       return true;
     } catch (e) {
       SnackBarService.show('There was a Error adding your Friends');
@@ -205,27 +225,36 @@ class MemoryCreationViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> finalizeCreation() async {
-    if (memoryId == null) return false;
+  Future<Memory?> finalizeCreation() async {
+    if (memoryId == null) return null;
 
     _isUPLoading = true;
     notifyListeners();
 
     try {
+      final location = _selectedLocation;
+
       await Future.wait([
         addFriendsToMemory(memoryId.toString(), selectedUsers),
-        createAndAddLocation(_selectedLocation!),
         executeUpload(memoryId!),
+        if (location != null) createAndAddLocation(location),
       ]);
+
+      // Fetch the fully updated memory from the repository after uploads/links complete
+      final createdMemory = await _repository.fetchMemoryDetails(
+        memoryId: memoryId.toString(),
+      );
+      SnackBarService.show('Memory was created successfully!');
 
       _repository.clearSelectedUsers();
       _photoRepository.clearPhotos();
 
-      return true;
+      return createdMemory;
     } catch (e) {
       debugPrint("Finalize Error: $e");
-      return false;
+      return null;
     } finally {
+      clearForm();
       _isUPLoading = false;
       notifyListeners();
     }

@@ -204,7 +204,7 @@ class _MemoryDetailScreenState extends State<MemoryDetailScreen> {
                   const SizedBox(height: 16),
 
                   // 5. MAP SECTION (M3 Container style)
-                  if (lat != null && lng != null) ...[
+                  if (lat != null && lng != null && memory.locationId != 1) ...[
                     Text(
                       "Location",
                       style: textTheme.titleMedium?.copyWith(

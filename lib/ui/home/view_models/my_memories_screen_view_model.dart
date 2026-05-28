@@ -79,4 +79,14 @@ class MemoryViewModel extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  void addMemoryToList(Memory newMemory) {
+    _memories.insert(0, newMemory);
+    notifyListeners();
+  }
+
+  void removeMemoryFromList(int memoryId) {
+    _memories.removeWhere((memory) => memory.memoryId == memoryId);
+    notifyListeners();
+  }
 }

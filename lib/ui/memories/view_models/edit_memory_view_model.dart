@@ -86,16 +86,13 @@ class EditMemoryViewModel extends ChangeNotifier {
   }
 
   /// Handles deleting the memory via your repository or API layer
-  Future<bool> deleteMemory(int memoryId, {required bool isFavourite}) async {
+  Future<bool> deleteMemory(int memoryId) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      await _memoryRepository.completeMemoryDeletion(
-        memoryId: memoryId,
-        isFavourite: isFavourite,
-      );
+      await _memoryRepository.completeMemoryDeletion(memoryId: memoryId);
 
       _isLoading = false;
       notifyListeners();

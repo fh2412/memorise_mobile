@@ -140,10 +140,10 @@ class MemoryRepository {
     return _apiService.deleteMemoryAndFriends(memoryId);
   }
 
-  Future<void> completeMemoryDeletion({
-    required int memoryId,
-    required bool isFavourite,
-  }) async {
+  Future<void> completeMemoryDeletion({required int memoryId}) async {
+    //TODO: for later usage it could be thougth of asking the user to confirm deletion if the memory is set as a favourite from one friend. For now with isFavourite = true they will always be deleted from Pinned Memories
+    bool isFavourite = true;
+
     // Step 1: Handle conditional pin removal
     if (isFavourite) {
       await _apiService.deleteMemoryFromAllPins(memoryId);

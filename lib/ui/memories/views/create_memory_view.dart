@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memorise_mobile/domain/models/google_places_model.dart';
+import 'package:memorise_mobile/domain/models/memory_model.dart';
+import 'package:memorise_mobile/ui/home/view_models/my_memories_screen_view_model.dart';
 import 'package:memorise_mobile/ui/memories/view_models/create_memory_view_model.dart';
 import 'package:memorise_mobile/ui/memories/views/photo_selection.dart';
 import 'package:memorise_mobile/ui/user/views/friends_selection_view.dart';
@@ -18,7 +20,7 @@ class _CreateMemoryScreenState extends State<CreateMemoryScreen> {
     // 1. Show the Loading Dialog
     showDialog(
       context: context,
-      barrierDismissible: false, // User can't click away
+      barrierDismissible: false,
       builder: (context) => const AlertDialog(
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -31,16 +33,16 @@ class _CreateMemoryScreenState extends State<CreateMemoryScreen> {
       ),
     );
 
-    // 2. Trigger the logic
-    bool success = await vm.finalizeCreation();
+    // 2. Trigger logic and capture the returned memory object
+    final Memory? newMemory = await vm.finalizeCreation();
 
     // 3. Close the Loading Dialog
     if (mounted) Navigator.of(context).pop();
 
-    // 4. If successful, go back to the Home/Feed screen
-    if (success && mounted) {
-      // Use pushNamedAndRemoveUntil or pop depending on your route logic
-      Navigator.of(context).pop();
+    // 4. If successful (memory is not null), inject it into your list state and go back
+    if (newMemory != null && mounted) {
+      context.read<MemoryViewModel>().addMemoryToList(newMemory);
+      Navigator.of(context).pop(); // Drops the creation screen back to Home
     }
   }
 
